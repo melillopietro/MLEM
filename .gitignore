@@ -1,0 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# PyInstaller
+*.spec
+
+# Logs
+*.log
+
+# Test / coverage reports
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.cache
+.pytest_cache/
+
+# VSCode
+.vscode/
+
+# Dataset / artifacts (optional: keep only if generated automatically)
+*.csv
+*.xlsx
+
+# Ignore specific folders
+rationale/
+oldfile/
+models/
+
+# Environment variable files
+.env
+.env.*
+
+# MyPy / Pyright / Type checkers
+.mypy_cache/
+.dmypy.json
+.pyre/

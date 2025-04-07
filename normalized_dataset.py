@@ -1,11 +1,15 @@
 import pandas as pd
+'''
+Author: Pietro Melillo
+Date: 2025-04-07
+Description: This script normalizes the dataset by mapping sectors to standard categories and normalizing country names.
+             It reads an Excel file, processes the data, and saves the normalized dataset as a CSV file.
+'''
 
-# === CONFIG ===
 input_file = "Dataset Ransomware.xlsx"
 sheet_name = "Dataset"
 output_file = "Dataset Normalized.csv"
 
-# === MAPPATURA SETTORI STANDARD ===
 sector_mapping = {
     "Healthcare": "Healthcare", "Healtcare": "Healthcare", "Healthcare ": "Healthcare",
     "Healthcare Services": "Healthcare", "Hospitals": "Healthcare", "Hospitals ": "Healthcare",
@@ -82,7 +86,6 @@ sector_mapping = {
     "Unknown": "Unknown", "Not Specified": "Unknown", "nan": "Unknown", "NaN": "Unknown"
 }
 
-# === DIZIONARIO NORMALIZZAZIONE PAESI ===
 country_normalization = {
     "usa": "USA", "united states": "USA", "uk": "UK", "uae": "UAE", "india": "India",
     "marocco": "Morocco", "camerun": "Cameroon", "cipro": "Cyprus", "potugal": "Portugal",
@@ -108,13 +111,11 @@ def map_sector(value):
         return "Unknown"
     return sector_mapping.get(str(value).strip(), "Unknown")
 
-# === CARICAMENTO E TRASFORMAZIONE ===
 df = pd.read_excel(input_file, sheet_name=sheet_name)
 
 df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.strftime('%Y-%m-%d')
 df["Victim sectors"] = df["Victim sectors"].apply(map_sector)
 df["Victim Country"] = df["Victim Country"].apply(normalize_country)
 
-# === SALVATAGGIO FINALE ===
 df.to_csv(output_file, index=False)
 print(f"✅ Dataset unificato salvato come: {output_file}")

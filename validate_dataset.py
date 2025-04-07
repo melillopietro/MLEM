@@ -1,10 +1,7 @@
 import pandas as pd
 import sys
 
-# === CONFIGURAZIONE ===
-# Inserisci il nome del file da validare (CSV o XLSX)
-file_path = "temp/final_ml_dataset_encoded.csv"  # o .csv
-
+file_path = "final_ml_dataset_encoded.csv" 
 # === LETTURA FILE ===
 try:
     if file_path.endswith(".csv"):
