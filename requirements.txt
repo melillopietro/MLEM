@@ -1,8 +1,23 @@
+# Core Data Science
+numpy>=1.24.0,<2.0.0
+pandas>=2.1.0
+scipy>=1.10.0
 joblib==1.4.2
-lightgbm==4.6.0
-matplotlib==3.10.1
-numpy==2.2.4
-pandas==2.2.3
-scikit_learn==1.6.1
-seaborn==0.13.2
-xgboost==3.0.0
+
+# Machine Learning Classico
+scikit-learn==1.5.2   # Versione più stabile per Windows rispetto alla 1.6.1 preview
+xgboost==2.0.3        # Versione 3.0.0 a volte dà problemi di compatibilità, 2.0.3 è rock-solid
+lightgbm==4.3.0
+
+# Deep Learning (Installa Python 3.11 prima!)
+tensorflow>=2.15.0    # Non esiste per Python 3.14!
+keras>=3.0.0
+
+# Visualizzazione e Interpretabilità
+matplotlib>=3.8.0
+seaborn>=0.13.0
+shap>=0.44.0
+
+# Utility
+openpyxl>=3.1.0       # Per leggere i file Excel originali
+tqdm>=4.66.0          # Barre di caricamento

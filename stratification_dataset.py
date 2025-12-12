@@ -1,66 +1,42 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+import os
+import sys
 
-y_train_path = "y_train.csv"
-y_val_path = "y_val.csv"
-y_test_path = "y_test.csv"
-label_column = "label_gang"
-output_csv = "stratificazione_report.csv"
-output_plot = "stratificazione_distribuzione.png"
+# CONFIGURAZIONE
+DATA_DIR = "./dataset_split"
 
-y_train = pd.read_csv(y_train_path)
-y_val = pd.read_csv(y_val_path)
-y_test = pd.read_csv(y_test_path)
+def check_stratification():
+    print("📊 Verifica Bilanciamento Classi (Stratificazione)...")
+    
+    # Costruzione percorsi corretti
+    y_train_path = os.path.join(DATA_DIR, "y_train.csv")
+    y_test_path = os.path.join(DATA_DIR, "y_test.csv")
 
-train_dist = y_train[label_column].value_counts(normalize=True)
-val_dist = y_val[label_column].value_counts(normalize=True)
-test_dist = y_test[label_column].value_counts(normalize=True)
+    # Verifica esistenza file
+    if not all(os.path.exists(p) for p in [y_train_path, y_test_path]):
+        print(f"⚠️ Impossibile trovare i file CSV in '{DATA_DIR}'. Assicurati di aver eseguito generate_dataset.py")
+        return
 
-dist_df = pd.DataFrame({
-    'Train %': train_dist,
-    'Validation %': val_dist,
-    'Test %': test_dist
-}).fillna(0).sort_values(by='Train %', ascending=False)
+    # Caricamento
+    try:
+        y_train = pd.read_csv(y_train_path)
+        y_test = pd.read_csv(y_test_path)
 
-dist_df['Val Diff %'] = (dist_df['Validation %'] - dist_df['Train %']) * 100
-dist_df['Test Diff %'] = (dist_df['Test %'] - dist_df['Train %']) * 100
+        # Calcolo distribuzioni
+        train_dist = y_train['label_gang'].value_counts(normalize=True)
+        test_dist = y_test['label_gang'].value_counts(normalize=True)
+        
+        # Confronto semplice (Differenza media delle percentuali)
+        diff = (train_dist - test_dist).abs().mean()
+        print(f"   -> Differenza media distribuzione Train vs Test: {diff:.5f}")
+        
+        if diff < 0.05:
+            print("✅ Stratificazione OK: Le distribuzioni sono statisticamente simili.")
+        else:
+            print("⚠️ ATTENZIONE: Possibile sbilanciamento tra Train e Test.")
+            
+    except Exception as e:
+        print(f"⚠️ Errore durante la lettura dei file: {e}")
 
-dist_df.to_csv(output_csv)
-print(f"✅ Report salvato in: {output_csv}")
-
-dataset_sizes = {
-    "Train": len(y_train),
-    "Validation": len(y_val),
-    "Test": len(y_test),
-    "Totale": len(y_train) + len(y_val) + len(y_test)
-}
-
-print("\n📦 Dimensioni dei set:")
-for k, v in dataset_sizes.items():
-    print(f"{k}: {v}")
-
-soglia = 2  # percentuale
-warning_df = dist_df[(dist_df['Val Diff %'].abs() > soglia) | (dist_df['Test Diff %'].abs() > soglia)]
-
-if not warning_df.empty:
-    print("\n⚠️ Classi con differenze > ±2% tra train e val/test:")
-    print(warning_df[['Train %', 'Validation %', 'Val Diff %', 'Test %', 'Test Diff %']].round(4))
-else:
-    print("\n✅ Stratificazione ben mantenuta (nessuna differenza > ±2%)")
-
-top_n = 20
-plot_df = dist_df.head(top_n).reset_index().melt(id_vars='index', value_vars=['Train %', 'Validation %', 'Test %'],
-                                                 var_name='Split', value_name='Percentuale')
-plot_df.rename(columns={'index': 'Gang'}, inplace=True)
-
-plt.figure(figsize=(14, 8))
-sns.barplot(data=plot_df, x='Percentuale', y='Gang', hue='Split', palette='Set2')
-plt.title(f'Distribuzione % per le prime {top_n} gang nei set')
-plt.xlabel("Percentuale")
-plt.ylabel("Gang")
-plt.legend(title="Split")
-plt.tight_layout()
-plt.savefig(output_plot)
-plt.close()
-print(f"📊 Grafico salvato in: {output_plot}")
+if __name__ == "__main__":
+    check_stratification()

@@ -1,52 +1,49 @@
 import pandas as pd
 import sys
+"""
+# DATASET VALIDATION
+# Checks that the dataset is in CSV or Excel format and contains the required columns.
+# Also checks that the columns are numeric and that there are no missing or duplicate values.
+# If the dataset is not valid, the program exits with an error message.
+"""
 
 file_path = "final_ml_dataset_encoded.csv" 
-# === LETTURA FILE ===
+# === FILE LOADING ===
 try:
     if file_path.endswith(".csv"):
         df = pd.read_csv(file_path)
     elif file_path.endswith(".xlsx"):
         df = pd.read_excel(file_path)
     else:
-        print("❌ Formato file non supportato. Usa .csv o .xlsx")
+        print("❌ Unsupported file format. Use .csv or .xlsx")
         sys.exit(1)
 except Exception as e:
-    print(f"❌ Errore durante il caricamento del file: {e}")
+    print(f"❌ Error loading file: {e}")
     sys.exit(1)
 
-# === ANALISI BASE ===
-print("\n📊 INFO GENERALI")
-print(f"Righe, colonne: {df.shape}")
-print(f"Colonne con valori mancanti:\n{df.isnull().sum()[df.isnull().sum() > 0]}")
-print(f"Righe duplicate: {df.duplicated().sum()}")
+# === BASIC ANALYSIS ===
+print("\n📊 GENERAL INFO")
+print(f"Rows, columns: {df.shape}")
+print(f"Columns with missing values:\n{df.isnull().sum()[df.isnull().sum() > 0]}")
+print(f"Duplicate rows: {df.duplicated().sum()}")
 
-# === VERIFICA LABEL ===
+# === LABEL CHECK ===
 label_col = "label_gang"
 if label_col not in df.columns:
-    print(f"❌ Colonna label '{label_col}' non trovata.")
+    print(f"❌ Label column '{label_col}' not found.")
     sys.exit(1)
 
 print(f"\n🏷️ LABEL: '{label_col}'")
-print(f"Valori unici: {df[label_col].nunique()}")
-print(f"Distribuzione:\n{df[label_col].value_counts().head(10)}")
+print(f"Unique values: {df[label_col].nunique()}")
+print(f"Distribution:\n{df[label_col].value_counts().head(10)}")
 
-# === VERIFICA TIPO FEATURE ===
+# === FEATURE TYPE CHECK ===
 non_numeric = df.drop(columns=[label_col]).select_dtypes(exclude=["int64", "float64", "uint8"]).columns.tolist()
 if non_numeric:
-    print("\n⚠️ Colonne non numeriche tra le feature (da convertire in numeri):")
+    print("\n⚠️ Non-numeric columns among features (convert to numbers):")
     for col in non_numeric:
         print(f" - {col}")
 else:
-    print("\n✅ Tutte le feature sono numeriche.")
+    print("\n✅ All features are numeric.")
 
-# === SUGGERIMENTO PER LABEL ENCODING ===
-print("\n💡 Suggerimento: per usare le label in classificazione ML, puoi applicare LabelEncoder come segue:\n")
-
-print("""
-from sklearn.preprocessing import LabelEncoder
-le = LabelEncoder()
-df["label_encoded"] = le.fit_transform(df["label_gang"])
-""")
-
-print("\n✅ Validazione completata.")
+print("\n✅ Validation completed.")

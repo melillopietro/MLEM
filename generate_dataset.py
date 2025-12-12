@@ -4,7 +4,7 @@ import os
 
 input_file = "final_ml_dataset_encoded.csv"
 output_dir = "dataset_split"
-min_samples = 10 
+min_samples = 10
 
 os.makedirs(output_dir, exist_ok=True)
 
