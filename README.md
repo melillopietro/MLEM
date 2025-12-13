@@ -1,67 +1,63 @@
-# 🛡️ MLEM: Ransomware Attribution Pipeline
+# MLEM: Hybrid Ransomware Attribution Framework
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.30%2B-red)
 ![Machine Learning](https://img.shields.io/badge/ML-XGBoost%20%7C%20ScikitLearn-green)
 ![License](https://img.shields.io/badge/License-MIT-grey)
 
-> **Advanced Cyber Threat Intelligence Tool** per l'attribuzione forense di gang Ransomware utilizzando Feature Ibride (TTPs MITRE ATT&CK + Vittimologia) e algoritmi di Machine Learning allo stato dell'arte.
+
+**MLEM** is an advanced Cyber Threat Intelligence (CTI) framework designed to attribute Ransomware-as-a-Service (RaaS) attacks to specific threat groups. By leveraging a **Hybrid Profiling** approach, the system combines technical behavioral signatures (MITRE ATT&CK TTPs) with contextual victimology data (Industrial Sector and Geography) to achieve high-precision forensic attribution.
+
+The framework utilizes **XGBoost** for classification on highly sparse datasets and integrates **SHAP (SHapley Additive exPlanations)** to provide granular, interpretable evidence for every attribution decision, eliminating the "black box" problem in AI-driven forensics.
 
 ---
 
-## 📋 Overview
+## Key Features
 
-**MLEM** (Machine Learning for Enterprise Malware) è un framework full-stack che automatizza il processo di attribuzione degli attacchi ransomware. A differenza dei sistemi tradizionali basati solo su hash o firme statiche, MLEM analizza il **comportamento** (Tattiche, Tecniche e Procedure) e il **contesto** (Settore e Paese della vittima) per identificare l'attore criminale (RaaS Gang).
-
-Il progetto include una **Dashboard Interattiva** per analisti SOC che permette di:
-1.  Addestrare e confrontare 5 famiglie di modelli ML.
-2.  Simulare scenari di attacco reali.
-3.  Eseguire attribuzioni forensi con gestione dell'incertezza.
-
----
-
-## ✨ Key Features
-
-### 🧠 1. Suite Multi-Modello
-Il sistema non si limita a un solo algoritmo, ma addestra e confronta in tempo reale una suite completa per garantire la robustezza scientifica:
-* **Gradient Boosting:** XGBoost (Best Performer), LightGBM.
-* **Ensemble:** Random Forest.
-* **Kernel Methods:** Support Vector Machines (SVM).
-* **Neural Networks:** Multi-Layer Perceptron (MLP).
-* **Instance-Based:** K-Nearest Neighbors (KNN).
-
-### 🕵️ 2. Forensic Investigator "Smart"
-Un'interfaccia dedicata agli analisti con funzionalità avanzate:
-* **🧪 Real-World Profiling:** Caricamento automatico di "fingerprint" reali dal database storico (es. *Carica profilo LockBit3*) per validare il modello.
-* **⚠️ Logica Anti-Allucinazione (N/D):** Sistema di sicurezza che restituisce **"N/D (Analisi Inconclusiva)"** se i dati di input sono scarsi (es. 1 sola TTP) o la confidenza del modello è < 50%, riducendo drasticamente i falsi positivi.
-
-### 🧬 3. Feature Engineering Ibrido
-Utilizza un vettore di feature complesso che combina:
-* **Tecniche MITRE ATT&CK** (es. *T1486 - Data Encrypted*).
-* **Vittimologia Geopolitica** (es. *Victim Country*).
-* **Vittimologia Industriale** (es. *Victim Sector*).
+* **Hybrid Profiling Engine:** Integrates technical artifacts (TTPs) with victimology metadata. Statistical ablation studies demonstrate that this hybrid approach improves attribution performance by **+5.24%** compared to purely technical baselines.
+* **State-of-the-Art Classification:** Built on XGBoost (eXtreme Gradient Boosting), optimized for sparse matrices and imbalanced multi-class datasets (handling over 50 distinct ransomware families).
+* **Explainable AI (XAI):**
+    * **Global Explainability:** Identifies top discriminative features across the entire threat landscape.
+    * **Local Forensics:** Provides instance-level SHAP waterfall charts to justify specific attribution decisions.
+* **Geospatial Intelligence:** Interactive 3D visualization mapping global victim distribution against active threat actors.
+* **Automated Scientific Validation:** Includes a suite of scripts for Stratified K-Fold Cross-Validation, Ablation Studies, and generation of engineering-grade reports (including MCC, Kappa, and Sparsity analysis).
 
 ---
 
-## 📊 Performance
+## Technical Architecture
 
-I risultati sperimentali sul Test Set dimostrano prestazioni allo stato dell'arte:
+The pipeline consists of three main stages:
 
-| Modello | F1-Score (Macro) | Accuratezza | Note |
-| :--- | :--- | :--- | :--- |
-| **XGBoost** | **0.9882** | **99.56%** | 🏆 Modello utilizzato in produzione |
-| **SVM** | 0.9700 | 99.02% | Eccellente generalizzazione |
-| **Random Forest** | 0.9598 | 99.07% | Alta efficienza computazionale |
-| **NeuralNet** | 0.9506 | 98.73% | Valida la separabilità dei dati |
+1.  **Preprocessing & Vectorization:** Converts raw CTI reports into a normalized feature vector space. Handles categorical encoding for victim sectors and countries.
+2.  **Model Training & Optimization:** Trains an ensemble of decision trees using Gradient Boosting. Hyperparameters are tuned to minimize log-loss while maximizing the Macro F1-Score.
+3.  **Forensic Dashboard:** A Streamlit-based interface for analysts to interact with the model, simulate attacks, and visualize intelligence data.
 
 ---
 
-## 🚀 Installation & Setup
+## Installation
 
-### Prerequisiti
-* Python 3.10 o superiore.
+### Prerequisites
+* Python 3.10 or higher (Python 3.12 recommended)
+* pip package manager
 
-### 1. Clona la repository
+### Setup
+1.  Clone the repository:
+    ```bash
+    git clone [https://github.com/your-username/mlem-attribution.git](https://github.com/your-username/mlem-attribution.git)
+    cd mlem-attribution
+    ```
+
+2.  Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+---
+
+## Usage
+
+### 1. Launching the Dashboard
+The primary interface is the web-based dashboard. To start the system:
+
 ```bash
-git clone [https://github.com/tuo-username/MLEM-Ransomware-Attribution.git](https://github.com/tuo-username/MLEM-Ransomware-Attribution.git)
-cd MLEM-Ransomware-Attribution
+python -m streamlit run dashboard.py
