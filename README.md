@@ -1,118 +1,67 @@
-# MLEM – Machine Learning for Exploit Mapping
+# 🛡️ MLEM: Ransomware Attribution Pipeline
 
-MLEM is a Machine Learning project focused on classifying ransomware gangs based on behavioral and technical features. The workflow is structured in modular scripts that handle data cleaning, formatting, stratification, validation, and model training with hyperparameter tuning.
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.30%2B-red)
+![Machine Learning](https://img.shields.io/badge/ML-XGBoost%20%7C%20ScikitLearn-green)
+![License](https://img.shields.io/badge/License-MIT-grey)
 
----
-### Repository Structure
-
-```
-MLEM/
-├── best_models/                      # Exported, trained models with best hyperparameters (.pkl)
-├── dataset_split/                   # Stratified training/validation/test sets
-├── gang_distribution_report.py      # Script to generate the gang distribution graph
-├── generate_dataset.py              # Script to generate the different sets (default is 80 - 15 - 15%)
-├── dataset_ML_Formatter.py          # One-Hot encoding and formatting
-├── final_ml_dataset_encoded.csv     # Clean, encoded dataset for modeling
-├── label_mapping.csv                # Mapping of gang names to numeric labels (needed for training)
-├── main.py                          # Optional main script
-├── model_comparison_results.csv     # Evaluation metrics from all trained models
-├── multimodel_gridsearch_pipeline.py # Training + Grid Search logic
-├── normalized_dataset.py            # Dataset cleaning and filtering
-├── README.md                        # Project documentation
-├── requirements.txt                 # Python dependency list
-├── stratification_dataset.py        # Dataset stratification logic
-├── validate_dataset.py              # Dataset validation and sanity checks
-```
----
-### Prerequisites
-
-Make sure you have Dataset Ransomware.xlsx in the main directory of the project
+> **Advanced Cyber Threat Intelligence Tool** per l'attribuzione forense di gang Ransomware utilizzando Feature Ibride (TTPs MITRE ATT&CK + Vittimologia) e algoritmi di Machine Learning allo stato dell'arte.
 
 ---
 
-### Installation
+## 📋 Overview
 
-1. Clone the repository or download the project files.
+**MLEM** (Machine Learning for Enterprise Malware) è un framework full-stack che automatizza il processo di attribuzione degli attacchi ransomware. A differenza dei sistemi tradizionali basati solo su hash o firme statiche, MLEM analizza il **comportamento** (Tattiche, Tecniche e Procedure) e il **contesto** (Settore e Paese della vittima) per identificare l'attore criminale (RaaS Gang).
 
-2. (Optional but recommended) Create and activate a virtual environment:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements
-```
-
----
-### Workflow
-
-Run the following scripts in the specified order to process the dataset and train the models.
-
-### 1. `normalized_dataset.py`
-
-Normalizes the dataset by mapping sectors to standard categories and normalizing country names.
-No feature normalization is needed since all features are binary.
-
-```bash
-python3 normalized_dataset.py
-```
-
-### 2. `dataset_ML_Formatter.py`
-
-Applies One-Hot Encoding to categorical features, making the dataset compatible with ML models.
-
-```bash
-python3 dataset_ML_Formatter.py
-```
-
-### 3. `generate_dataset.py`
-
-Splits the dataset into training, validation, and test sets, preserving class distribution.
-
-```bash
-python3 generate_dataset.py
-```
-
-### 4. `startification_dataset.py`
-
-Evaluates the stratification of che training - validation - test sets;
-
-```bash
-python3 stratification_dataset.py
-```
-
-### 5. `multimodel_gridsearch_pipeline.py`
-
-Trains multiple models with Grid Search for hyperparameter tuning.  
-Outputs model metrics and saves the best trained models as `.pkl` files.
-
-```bash
-python3 multimodel_gridsearch_pipeline.py
-```
+Il progetto include una **Dashboard Interattiva** per analisti SOC che permette di:
+1.  Addestrare e confrontare 5 famiglie di modelli ML.
+2.  Simulare scenari di attacco reali.
+3.  Eseguire attribuzioni forensi con gestione dell'incertezza.
 
 ---
 
-## Results
+## ✨ Key Features
 
-## model_comparision_results.csv : 
-    it shows the best models based on f1 macro and accuracy metrics.
+### 🧠 1. Suite Multi-Modello
+Il sistema non si limita a un solo algoritmo, ma addestra e confronta in tempo reale una suite completa per garantire la robustezza scientifica:
+* **Gradient Boosting:** XGBoost (Best Performer), LightGBM.
+* **Ensemble:** Random Forest.
+* **Kernel Methods:** Support Vector Machines (SVM).
+* **Neural Networks:** Multi-Layer Perceptron (MLP).
+* **Instance-Based:** K-Nearest Neighbors (KNN).
+
+### 🕵️ 2. Forensic Investigator "Smart"
+Un'interfaccia dedicata agli analisti con funzionalità avanzate:
+* **🧪 Real-World Profiling:** Caricamento automatico di "fingerprint" reali dal database storico (es. *Carica profilo LockBit3*) per validare il modello.
+* **⚠️ Logica Anti-Allucinazione (N/D):** Sistema di sicurezza che restituisce **"N/D (Analisi Inconclusiva)"** se i dati di input sono scarsi (es. 1 sola TTP) o la confidenza del modello è < 50%, riducendo drasticamente i falsi positivi.
+
+### 🧬 3. Feature Engineering Ibrido
+Utilizza un vettore di feature complesso che combina:
+* **Tecniche MITRE ATT&CK** (es. *T1486 - Data Encrypted*).
+* **Vittimologia Geopolitica** (es. *Victim Country*).
+* **Vittimologia Industriale** (es. *Victim Sector*).
 
 ---
 
-## Expected Data Directory
+## 📊 Performance
 
-Ensure the following files are present in `./dataset_split` before running the training pipeline:
+I risultati sperimentali sul Test Set dimostrano prestazioni allo stato dell'arte:
 
-- `X_train.csv`
-- `X_val.csv`
-- `X_test.csv`
-- `y_train.csv`
-- `y_val.csv`
-- `y_test.csv`
-
-These are generated by the previous scripts.
+| Modello | F1-Score (Macro) | Accuratezza | Note |
+| :--- | :--- | :--- | :--- |
+| **XGBoost** | **0.9882** | **99.56%** | 🏆 Modello utilizzato in produzione |
+| **SVM** | 0.9700 | 99.02% | Eccellente generalizzazione |
+| **Random Forest** | 0.9598 | 99.07% | Alta efficienza computazionale |
+| **NeuralNet** | 0.9506 | 98.73% | Valida la separabilità dei dati |
 
 ---
+
+## 🚀 Installation & Setup
+
+### Prerequisiti
+* Python 3.10 o superiore.
+
+### 1. Clona la repository
+```bash
+git clone [https://github.com/tuo-username/MLEM-Ransomware-Attribution.git](https://github.com/tuo-username/MLEM-Ransomware-Attribution.git)
+cd MLEM-Ransomware-Attribution
