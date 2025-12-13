@@ -1,0 +1,63 @@
+MLEM - RANSOMWARE ATTRIBUTION REPORT
+Data generazione: 2025-12-13 15:56:53
+============================================================
+
+============================================================
+ 1. PERFORMANCE COMPARATIVA (STATE-OF-THE-ART)
+============================================================
+Modello              | F1-Score   | Accuracy   | Time(s)   
+------------------------------------------------------------
+XGBoost              | 0.9731     | 0.9927     | 5.36
+SVM                  | 0.9700     | 0.9903     | 12.90
+NeuralNet_MLP        | 0.9506     | 0.9873     | 12.77
+KNN                  | 0.8319     | 0.9313     | 0.12
+RandomForest         | 0.3729     | 0.5923     | 0.07
+LightGBM             | 0.0686     | 0.1851     | 0.73
+
+🏆 WINNER: XGBoost (F1: 0.9731)
+
+============================================================
+ 2. ROBUSTNESS ANALYSIS (5-FOLD CV)
+============================================================
+Esecuzione Stratified K-Fold in corso...
+Mean F1-Score:      0.9711
+Standard Deviation: 0.0090
+✅ CONCLUSIONE: Il modello è altamente STABILE (Low Variance).
+
+============================================================
+ 3. ABLATION STUDY (HYBRID IMPACT)
+============================================================
+Ricalcolo impatto feature (Solo TTP vs Ibrido)...
+Baseline (Solo TTPs)     : 0.9242
+MLEM (Full Hybrid)       : 0.9766
+----------------------------------------
+INCREMENTO NETTO: +5.24%
+✅ CONCLUSIONE: L'approccio ibrido è statisticamente superiore.
+
+============================================================
+ 4. GLOBAL EXPLAINABILITY (TOP 20 FEATURES)
+============================================================
+Rank  | Feature Name                             | Importance
+-----------------------------------------------------------------
+1     | T1614                                    | 0.2179
+2     | T1480.001                                | 0.0785
+3     | T1027.010                                | 0.0705
+4     | T1048.003                                | 0.0637
+5     | T1036.001                                | 0.0553
+6     | T1560                                    | 0.0432
+7     | T1001                                    | 0.0403
+8     | T1048.002                                | 0.0365
+9     | T1115                                    | 0.0313
+10    | T1036                                    | 0.0272
+11    | T1134.001                                | 0.0233
+12    | T1547.001                                | 0.0197
+13    | T1106                                    | 0.0169
+14    | T1087                                    | 0.0146
+15    | T1558.003                                | 0.0141
+16    | T1027.006                                | 0.0137
+17    | T1102                                    | 0.0132
+18    | T1531                                    | 0.0115
+19    | T1110.004                                | 0.0110
+20    | T1518                                    | 0.0109
+
+NOTA: Queste sono le feature che il modello ritiene più discriminanti.

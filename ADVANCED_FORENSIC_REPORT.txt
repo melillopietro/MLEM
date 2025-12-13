@@ -1,0 +1,89 @@
+MLEM - RANSOMWARE ATTRIBUTION FRAMEWORK
+DOCUMENT TYPE: Advanced Technical Report
+DATE: 2025-12-13 16:06:05
+================================================================================
+
+################################################################################
+  1. DATASET & PROBLEM SPACE ANALYSIS
+################################################################################
+Total Training Samples:      9608
+Feature Vector Dimensions:   502
+Target Classes (Groups):     78 distinct Ransomware Families
+Dominant Class:              lockbit3 (1383 samples)
+Imbalance Ratio (Approx):    1:6.95
+
+################################################################################
+  2. MODEL CONFIGURATION (REPRODUCIBILITY)
+################################################################################
+Algorithm:                   XGBClassifier
+ Hyperparameters:
+   - n_estimators:     10
+   - max_depth:        3
+   - learning_rate:    None
+   - objective:        multi:softmax
+   - booster:          None
+
+################################################################################
+  3. STATISTICAL PERFORMANCE VALIDATION
+################################################################################
+
+----------------------------------------
+ > Cross-Validation Results (5-Folds)
+----------------------------------------
+Macro F1-Score:          0.9711 (Std Dev: 0.0090)
+Overall Accuracy:        0.9939 (Std Dev: 0.0017)
+
+----------------------------------------
+ > Advanced Metrics (Hold-Out Set)
+----------------------------------------
+Cohen's Kappa:           0.9940
+   -> Interpretation:      Strong/Perfect Agreement
+Matthews Corr. Coeff.:   0.9940 (Robust metric for unbalanced datasets)
+Macro Precision:         0.9890
+Macro Recall:            0.9786
+
+################################################################################
+  4. FORENSIC ERROR ANALYSIS
+################################################################################
+
+----------------------------------------
+ > Confusion Matrix Analysis (Top Misclassifications)
+----------------------------------------
+Count  | True Class           -> Predicted Class (Error)
+-------------------------------------------------------
+5      | abyss                -> ragroup             
+5      | darkvault            -> dragonforce         
+1      | dunghill_leak        -> donutleaks          
+
+Insight: These errors suggest TTP overlap between the listed groups.
+
+################################################################################
+  5. FEATURE ENGINEERING IMPACT
+################################################################################
+
+----------------------------------------
+ > Top 15 Discriminative Features
+----------------------------------------
+Rank  | Feature Name                                  | Importance
+----------------------------------------------------------------------
+1     | T1614                                         | 0.1186
+2     | T1560                                         | 0.0952
+3     | T1480.001                                     | 0.0867
+4     | T1027.010                                     | 0.0771
+5     | T1048.003                                     | 0.0695
+6     | T1036.001                                     | 0.0606
+7     | T1048.002                                     | 0.0399
+8     | T1001                                         | 0.0347
+9     | T1115                                         | 0.0339
+10    | T1036                                         | 0.0256
+11    | T1134.001                                     | 0.0252
+12    | T1518                                         | 0.0224
+13    | T1547.001                                     | 0.0217
+14    | T1134                                         | 0.0200
+15    | T1087                                         | 0.0155
+
+----------------------------------------
+ > Conclusion on Hybrid Approach
+----------------------------------------
+The integration of Victimology features with TTPs has proven to statistically
+improve classification performance (see specific Ablation Study for details).

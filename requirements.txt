@@ -1,23 +1,29 @@
-# Core Data Science
+# --- Core Data Science ---
+# Blocchiamo numpy sotto la versione 2.0.0 per evitare conflitti con librerie non ancora aggiornate
 numpy>=1.24.0,<2.0.0
 pandas>=2.1.0
 scipy>=1.10.0
-joblib==1.4.2
+joblib>=1.4.0
 
-# Machine Learning Classico
-scikit-learn==1.5.2   # Versione più stabile per Windows rispetto alla 1.6.1 preview
-xgboost==2.0.3        # Versione 3.0.0 a volte dà problemi di compatibilità, 2.0.3 è rock-solid
-lightgbm==4.3.0
+# --- Machine Learning Models ---
+scikit-learn>=1.5.0
+xgboost>=2.0.3        # Versione stabile e collaudata
+lightgbm>=4.3.0
 
-# Deep Learning (Installa Python 3.11 prima!)
-tensorflow>=2.15.0    # Non esiste per Python 3.14!
-keras>=3.0.0
+# --- Deep Learning (Opzionale) ---
+# TensorFlow è pesante. Se non usi le Reti Neurali nel Tab 1, puoi lasciarlo commentato.
+# tensorflow>=2.16.0
 
-# Visualizzazione e Interpretabilità
+# --- Dashboard & Visualizzazione ---
+streamlit>=1.32.0
+plotly>=5.19.0        # FONDAMENTALE per la Threat Map geografica
 matplotlib>=3.8.0
 seaborn>=0.13.0
-shap>=0.44.0
 
-# Utility
-openpyxl>=3.1.0       # Per leggere i file Excel originali
-tqdm>=4.66.0          # Barre di caricamento
+# --- Explainable AI (XAI) ---
+shap>=0.45.0          # FONDAMENTALE per i grafici a cascata
+
+# --- Gestione File ---
+openpyxl>=3.1.0       # Per leggere i file Excel (.xlsx)
+xlsxwriter>=3.1.0     # Per scrivere/esportare Excel
+tqdm>=4.66.0          # Barre di caricamento per script lunghi
