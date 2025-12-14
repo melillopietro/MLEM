@@ -90,7 +90,6 @@ with st.sidebar:
     
     st.divider()
     if st.button("RESET SYSTEM CACHE"):
-        # Pulisce cache RAM e file
         st.cache_data.clear()
         for f in [RESULTS_CSV, MODEL_FILE, ENCODER_FILE, FEATURES_CONFIG, "RandomForest_best_model.pkl"]:
             if os.path.exists(f): os.remove(f)
@@ -124,7 +123,7 @@ with tab1:
                 if os.path.exists("generate_final_graphs.py"): run_command("generate_final_graphs.py", s)
                 s.update(label="Analysis Completed", state="complete")
         
-        st.cache_data.clear() # Ricarica i nuovi dati generati
+        st.cache_data.clear() 
         st.success("Pipeline executed successfully.")
 
 # --- TAB 2: RESULTS ---
@@ -147,7 +146,7 @@ with tab2:
 
     st.divider()
 
-    # 2. CYBER THREAT GLOBE (3D INTERACTIVE) - FULL POWER MODE
+    # 2. CYBER THREAT GLOBE
     st.subheader("Global Threat Intelligence Center")
     st.markdown("Real-time visualization of Ransomware Victimology density (Full Dataset Analysis).")
     
@@ -158,14 +157,10 @@ with tab2:
             
             if X_map is not None:
                 country_cols = [c for c in X_map.columns if "country" in c]
-                
                 if country_cols:
-                    # === FULL POWER MODE: NO SAMPLING ===
                     X_map_sample = X_map 
-                    # ====================================
 
                     active_countries = []
-                    # Ottimizzazione calcolo vettoriale
                     country_sums = X_map_sample[country_cols].sum().sort_values(ascending=False)
                     
                     for col, count in country_sums.items():
@@ -194,7 +189,7 @@ with tab2:
                         col_map, col_list = st.columns([3, 1])
                         with col_map: st.plotly_chart(fig_map, use_container_width=True)
                         with col_list:
-                            st.markdown("#### 🎯 Top Targets (All Time)")
+                            st.markdown("#### 🎯 Top Targets")
                             st.dataframe(map_counts.head(10).style.background_gradient(cmap="Reds"), hide_index=True, use_container_width=True)
                     else: st.warning("No geographic data found.")
                 else: st.warning("Dataset missing 'country' columns.")
@@ -203,7 +198,7 @@ with tab2:
 
     st.divider()
 
-    # 3. ADVANCED TACTICAL ANALYSIS (HEATMAP)
+    # 3. HEATMAP
     st.subheader("Tactical Overlap Analysis (TTP Heatmap)")
     st.markdown("Visual correlation between Ransomware Families and MITRE ATT&CK Techniques.")
     
@@ -215,8 +210,6 @@ with tab2:
             if X_h is not None and y_h is not None:
                 df_heat = X_h.copy()
                 df_heat['Gang'] = y_h['label_gang']
-                
-                # Top 10 Gangs più attive
                 top_gangs = df_heat['Gang'].value_counts().head(10).index
                 df_heat_top = df_heat[df_heat['Gang'].isin(top_gangs)]
                 ttp_cols_heat = [c for c in df_heat.columns if (c.startswith("T") and c[1].isdigit())]
@@ -232,20 +225,18 @@ with tab2:
                     )
                     fig_heat.update_layout(title="<b>Signature Fingerprinting: Who uses what?</b>", height=500)
                     st.plotly_chart(fig_heat, use_container_width=True)
-                    st.caption("Insight: Darker areas show distinct techniques. Vertical bands show shared tools (Affiliate Overlap).")
                 else: st.warning("Not enough TTP density.")
         except Exception as e: st.warning(f"Heatmap Error: {e}")
 
     st.divider()
 
-    # 4. THREAT ACTOR ENCYCLOPEDIA
+    # 4. ENCYCLOPEDIA
     st.subheader("Threat Actor Profiling System")
     st.markdown("Automated generation of behavioral profiles based on historical data.")
     
     y_prof = load_data(os.path.join(DATA_DIR, "y_train.csv"))
     if y_prof is not None:
         all_gangs = sorted(y_prof['label_gang'].unique())
-        
         col_sel, col_stats = st.columns([1, 3])
         with col_sel: selected_gang = st.selectbox("Select Threat Actor:", all_gangs)
         
@@ -253,15 +244,12 @@ with tab2:
             X_prof = load_data(os.path.join(DATA_DIR, "X_train.csv"))
             if selected_gang and X_prof is not None:
                 indices = y_prof[y_prof['label_gang'] == selected_gang].index
-                # Ottimizzazione: slice dataframe
                 X_prof_gang = X_prof.iloc[indices]
                 
                 sec_cols = [c for c in X_prof_gang.columns if "sector" in c]
                 top_sectors = X_prof_gang[sec_cols].sum().sort_values(ascending=False).head(3)
-                
                 cnt_cols = [c for c in X_prof_gang.columns if "country" in c]
                 top_countries = X_prof_gang[cnt_cols].sum().sort_values(ascending=False).head(3)
-                
                 tech_cols = [c for c in X_prof_gang.columns if c.startswith("T") and c[1].isdigit()]
                 top_techs = X_prof_gang[tech_cols].sum().sort_values(ascending=False).head(5)
 
@@ -273,7 +261,6 @@ with tab2:
                             name = idx.replace("victim_sector_", "").replace("sector_", "")
                             st.progress(int(val/len(X_prof_gang)*100), text=f"{name}")
                     else: st.write("No distinct sector pattern.")
-
                 with c2:
                     st.markdown("**🌍 Preferred Targets**")
                     if not top_countries.empty and top_countries.max() > 0:
@@ -281,15 +268,14 @@ with tab2:
                             name = idx.replace("victim_country_", "").replace("country_", "")
                             st.write(f"📍 **{name}**")
                     else: st.write("Global/Random targeting.")
-
                 with c3:
-                    st.markdown("**🛠️ Key TTPs (Modus Operandi)**")
+                    st.markdown("**🛠️ Key TTPs**")
                     for idx, val in top_techs.items(): st.code(idx, language="text")
     st.divider()
 
-    # 5. SCIENTIFIC CLUSTERING (PCA Visualization) - FULL POWER
+    # 5. PCA CLUSTERING
     st.subheader("Gang Similarity Clusters (PCA Projection)")
-    st.markdown("2D projection of the high-dimensional feature space to visualize logical distance between groups.")
+    st.markdown("2D projection of the high-dimensional feature space.")
     
     if PLOTLY_AVAILABLE:
         try:
@@ -300,13 +286,7 @@ with tab2:
             if X_pca is not None and y_pca is not None:
                 df_pca = X_pca.copy()
                 df_pca['Label'] = y_pca['label_gang']
-                
-                # === FULL POWER MODE ===
-                if len(df_pca) > 10000: 
-                    df_pca = df_pca.sample(10000, random_state=42)
-                else:
-                    df_pca = df_pca # Usa tutto se < 10k
-                # =======================
+                if len(df_pca) > 10000: df_pca = df_pca.sample(10000, random_state=42)
                 
                 features_only = df_pca.drop(columns=['Label'])
                 pca = PCA(n_components=2)
@@ -317,90 +297,79 @@ with tab2:
                 
                 fig_cluster = px.scatter(
                     fig_df, x='PC1', y='PC2', color='Gang',
-                    title="<b>Semantic Similarity Space</b> (Closer points = Similar TTPs/Targets)",
+                    title="<b>Semantic Similarity Space</b>",
                     opacity=0.7, hover_data=['Gang'],
                     color_discrete_sequence=px.colors.qualitative.Bold
                 )
-                fig_cluster.update_layout(
-                    template="plotly_dark", height=500,
-                    xaxis_title="Principal Component 1", yaxis_title="Principal Component 2"
-                )
+                fig_cluster.update_layout(template="plotly_dark", height=500)
                 st.plotly_chart(fig_cluster, use_container_width=True)
-                st.caption("Insight: Distinct clusters indicate distinct modus operandi. Overlapping clusters imply strong tactical similarities.")
         except Exception as e: st.warning(f"Clustering Error: {e}")
 
     st.divider()
 
-    # 6. ATTACK SOPHISTICATION METRICS
+    # 6. SOPHISTICATION
     st.subheader("Operational Sophistication Analysis")
-    st.markdown("Quantifying the complexity of attacks based on the number of TTPs employed per incident.")
-    
     if PLOTLY_AVAILABLE:
         try:
             X_s = load_data(os.path.join(DATA_DIR, "X_train.csv"))
             y_s = load_data(os.path.join(DATA_DIR, "y_train.csv"))
-            
             if X_s is not None and y_s is not None:
                 tech_cols_only = [c for c in X_s.columns if (c.startswith("T") and c[1].isdigit())]
                 df_soph = pd.DataFrame()
                 df_soph['Gang'] = y_s['label_gang']
                 df_soph['Complexity'] = X_s[tech_cols_only].sum(axis=1)
-                
                 soph_ranking = df_soph.groupby('Gang')['Complexity'].mean().sort_values(ascending=False).head(15)
                 
                 fig_soph = px.bar(
-                    soph_ranking, orientation='h',
-                    x=soph_ranking.values, y=soph_ranking.index,
-                    title="<b>Average Attack Chain Complexity (Top 15 Groups)</b>",
-                    labels={'x': 'Avg. Unique Techniques per Attack', 'y': 'Ransomware Family'},
+                    soph_ranking, orientation='h', x=soph_ranking.values, y=soph_ranking.index,
+                    title="<b>Average Attack Chain Complexity</b>",
                     color=soph_ranking.values, color_continuous_scale="Plasma"
                 )
                 fig_soph.update_layout(yaxis={'categoryorder':'total ascending'})
                 st.plotly_chart(fig_soph, use_container_width=True)
-                st.caption("Insight: Higher complexity often indicates advanced APT-like capabilities (e.g., Conti, LockBit).")
-        except Exception as e: st.warning(f"Sophistication Analysis Error: {e}")
+        except Exception as e: st.warning(f"Sophistication Error: {e}")
 
     st.divider()
     
-    # 7. ADVANCED NETWORK FORENSICS (GRAPH THEORY)
+    # 7. NETWORK TOPOLOGY (WITH % SIMILARITY)
     st.subheader("Threat Actor Network Topology")
-    st.markdown("Graph-based visualization of relationships between Ransomware families based on TTP similarity.")
+    st.markdown("Graph-based visualization of relationships between Ransomware families.")
     
-    if st.checkbox("Enable High-Performance Graph Computation (Uses ~4GB RAM)", value=True):
+    if st.checkbox("Enable High-Performance Graph Computation", value=True):
         if PLOTLY_AVAILABLE:
             try:
                 import networkx as nx
                 from sklearn.metrics.pairwise import cosine_similarity
                 
                 st.info("🚀 Processing Similarity Matrix on full dataset...")
-                
-                # Carichiamo i dati
                 X_net = load_data(os.path.join(DATA_DIR, "X_train.csv"))
                 y_net = load_data(os.path.join(DATA_DIR, "y_train.csv"))
                 
                 if X_net is not None and y_net is not None:
                     df_net = X_net.copy()
                     df_net['Gang'] = y_net['label_gang']
-                    
-                    # Raggruppa per gang e calcola la media
                     gang_profiles = df_net.groupby('Gang').mean()
-                    
-                    # Calcolo Matrice di Similarità
                     sim_matrix = cosine_similarity(gang_profiles)
                     
                     G = nx.Graph()
                     gang_names = gang_profiles.index.tolist()
+                    for gang in gang_names: G.add_node(gang)
                     
-                    for gang in gang_names:
-                        G.add_node(gang)
-                    
-                    threshold = 0.85 
+                    threshold = 0.70 # Abbassato leggermente per vedere più connessioni
                     rows, cols = np.where(sim_matrix > threshold)
                     
+                    table_data = []
+
                     for r, c in zip(rows, cols):
                         if r < c:
                             weight = sim_matrix[r, c]
                             G.add_edge(gang_names[r], gang_names[c], weight=weight)
+                            # AGGIUNTA: FORMATTAZIONE PERCENTUALE
+                            table_data.append({
+                                "Threat Actor A": gang_names[r],
+                                "Threat Actor B": gang_names[c],
+                                "Similarity": f"{weight*100:.2f}%" 
+                            })
                     
                     pos = nx.spring_layout(G, k=0.5, seed=42)
                     
@@ -413,16 +382,13 @@ with tab2:
                         edge_y.extend([y0, y1, None])
 
                     edge_trace = import_plotly_graph_objects().Scatter(
-                        x=edge_x, y=edge_y,
-                        line=dict(width=0.5, color='#888'),
-                        hoverinfo='none',
-                        mode='lines')
+                        x=edge_x, y=edge_y, line=dict(width=0.5, color='#888'),
+                        hoverinfo='none', mode='lines')
 
                     node_x = []
                     node_y = []
                     node_text = []
                     node_adj = []
-                    
                     for node in G.nodes():
                         x, y = pos[node]
                         node_x.append(x)
@@ -431,69 +397,152 @@ with tab2:
                         node_adj.append(len(G.adj[node])) 
 
                     node_trace = import_plotly_graph_objects().Scatter(
-                        x=node_x, y=node_y,
-                        mode='markers+text',
-                        hoverinfo='text',
-                        text=node_text,
-                        textposition="top center",
-                        marker=dict(
-                            showscale=True,
-                            colorscale='YlGnBu',
-                            reversescale=True,
-                            color=node_adj,
-                            size=15,
-                            colorbar=dict(
-                                thickness=15,
-                                title=dict(text='Node Connections', side='right'),
-                                xanchor='left'
-                            ),
-                            line_width=2))
+                        x=node_x, y=node_y, mode='markers+text', hoverinfo='text',
+                        text=node_text, textposition="top center",
+                        marker=dict(showscale=True, colorscale='YlGnBu', reversescale=True,
+                            color=node_adj, size=15, line_width=2,
+                            colorbar=dict(thickness=15, title=dict(text='Connections', side='right'))))
 
                     fig_net = import_plotly_graph_objects().Figure(data=[edge_trace, node_trace],
                                 layout=import_plotly_graph_objects().Layout(
-                                    title=dict(
-                                        text='<b>Ransomware Ecosystem Topology</b>',
-                                        font=dict(size=16)
-                                    ),
-                                    showlegend=False,
-                                    hovermode='closest',
-                                    margin=dict(b=20,l=5,r=5,t=40),
-                                    template="plotly_dark",
-                                    height=600,
+                                    title=dict(text='<b>Ransomware Ecosystem Topology</b>', font=dict(size=16)),
+                                    showlegend=False, hovermode='closest',
+                                    margin=dict(b=20,l=5,r=5,t=40), template="plotly_dark", height=600,
                                     xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
-                                    )
+                                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
                     
-                    st.plotly_chart(fig_net, use_container_width=True)
-                    st.caption(f"Network Analysis processed on {len(gang_names)} unique Threat Actors. Connections indicate >{threshold*100}% behavioral similarity.")
-                    
-            except Exception as e:
-                st.warning(f"Network Graph Error: {e}. (Requires networkx library)")
+                    col_graph, col_data = st.columns([3, 1])
+                    with col_graph:
+                        st.plotly_chart(fig_net, use_container_width=True)
+                    with col_data:
+                        st.markdown("#### 🔗 Connection Data")
+                        if table_data:
+                            df_net_table = pd.DataFrame(table_data).sort_values(by="Similarity", ascending=False)
+                            st.dataframe(df_net_table, hide_index=True, use_container_width=True, height=500)
+                        else: st.write("No strong connections found.")
+
+            except Exception as e: st.warning(f"Network Graph Error: {e}")
 
     st.divider()
 
-    # 8. GLOBAL FEATURE IMPORTANCE
-    st.subheader("Global Explainability (Top Discriminative Features)")
-    
-    if PLOTLY_AVAILABLE and os.path.exists(MODEL_FILE) and os.path.exists(FEATURES_CONFIG):
+    # 8. SANKEY DIAGRAM
+    st.subheader("Macro-Economic Attack Flow (Sankey Diagram)")
+    st.markdown("Visualizing the flow of attacks from **Target Country** → **Victim Sector** → **Threat Actor**.")
+
+    if st.checkbox("Generate Ecosystem Flow (High Memory Usage)", value=True):
+        if PLOTLY_AVAILABLE:
+            try:
+                X_san = load_data(os.path.join(DATA_DIR, "X_train.csv"))
+                y_san = load_data(os.path.join(DATA_DIR, "y_train.csv"))
+
+                if X_san is not None and y_san is not None:
+                    df_flow = pd.DataFrame()
+                    df_flow['Gang'] = y_san['label_gang']
+                    
+                    country_cols = [c for c in X_san.columns if "country" in c]
+                    if country_cols:
+                        idx_c = X_san[country_cols].idxmax(axis=1)
+                        df_flow['Country'] = idx_c.str.replace("victim_country_", "").str.replace("country_", "")
+                    else: df_flow['Country'] = "Unknown"
+
+                    sector_cols = [c for c in X_san.columns if "sector" in c]
+                    if sector_cols:
+                        idx_s = X_san[sector_cols].idxmax(axis=1)
+                        df_flow['Sector'] = idx_s.str.replace("victim_sector_", "").str.replace("sector_", "")
+                    else: df_flow['Sector'] = "Unknown"
+
+                    top_c = df_flow['Country'].value_counts().head(10).index
+                    top_s = df_flow['Sector'].value_counts().head(10).index
+                    top_g = df_flow['Gang'].value_counts().head(10).index
+                    
+                    df_final = df_flow[df_flow['Country'].isin(top_c) & df_flow['Sector'].isin(top_s) & df_flow['Gang'].isin(top_g)]
+
+                    flow1 = df_final.groupby(['Country', 'Sector']).size().reset_index(name='Count')
+                    flow1.columns = ['Source', 'Target', 'Value']
+                    flow2 = df_final.groupby(['Sector', 'Gang']).size().reset_index(name='Count')
+                    flow2.columns = ['Source', 'Target', 'Value']
+                    
+                    links = pd.concat([flow1, flow2], axis=0)
+                    all_nodes = list(pd.concat([links['Source'], links['Target']]).unique())
+                    node_map = {name: i for i, name in enumerate(all_nodes)}
+                    colors = px.colors.qualitative.Pastel
+                    
+                    fig_sankey = import_plotly_graph_objects().Figure(data=[import_plotly_graph_objects().Sankey(
+                        node=dict(pad=15, thickness=20, line=dict(color="black", width=0.5),
+                            label=all_nodes, color=[colors[i % len(colors)] for i in range(len(all_nodes))]),
+                        link=dict(source=links['Source'].map(node_map), target=links['Target'].map(node_map),
+                            value=links['Value'], color='rgba(100, 100, 100, 0.2)'))])
+
+                    fig_sankey.update_layout(title_text="<b>Attack Vector Pathways</b>", font_size=12, height=700, template="plotly_dark")
+                    
+                    col_sankey, col_sankey_data = st.columns([3, 1])
+                    with col_sankey: st.plotly_chart(fig_sankey, use_container_width=True)
+                    with col_sankey_data:
+                        st.markdown("#### 🌊 Flow Volume Data")
+                        links_display = links.sort_values(by="Value", ascending=False).rename(columns={"Value": "Volume"})
+                        st.dataframe(links_display, hide_index=True, use_container_width=True, height=700)
+
+            except Exception as e: st.warning(f"Sankey Error: {e}")
+
+    st.divider()
+
+    # 9. FEATURE IMPORTANCE
+    st.subheader("Global Explainability")
+    if PLOTLY_AVAILABLE and os.path.exists(MODEL_FILE):
         try:
             model_glob = joblib.load(MODEL_FILE)
             with open(FEATURES_CONFIG, 'r') as f: f_list = json.load(f)
             if hasattr(model_glob, "feature_importances_"):
                 imp_df = pd.DataFrame({'Feature': f_list, 'Importance': model_glob.feature_importances_}).sort_values(by='Importance', ascending=False).head(10)
-                fig_imp = px.bar(imp_df, x='Importance', y='Feature', orientation='h', title="Top 10 Influential Features (XGBoost)", color='Importance', color_continuous_scale='Viridis')
+                fig_imp = px.bar(imp_df, x='Importance', y='Feature', orientation='h', title="Top 10 Influential Features")
                 fig_imp.update_layout(yaxis={'categoryorder':'total ascending'})
                 st.plotly_chart(fig_imp, use_container_width=True)
         except Exception as e: st.warning(f"Feature Importance Error: {e}")
 
     st.divider()
+    
+    # 10. STATISTICAL REPORTS (RENOVATED)
+    st.subheader("📊 Model Performance & Statistical Validation")
+    st.markdown("Comprehensive evaluation of model robustness and classification metrics.")
 
-    # 9. STATIC REPORTS
-    st.subheader("Statistical Reports")
-    cols = st.columns(2)
-    imgs = ["Figure_2_ROC_PR_Comparison.png", "Figure_3_Confusion_Matrix_XGBoost.png"]
-    for i, img in enumerate(imgs):
-        if os.path.exists(f"reports/{img}"): cols[i%2].image(f"reports/{img}", caption=img)
+    # Load Results for metrics
+    if os.path.exists(RESULTS_CSV):
+        df_res = pd.read_csv(RESULTS_CSV)
+        best_model = df_res.loc[df_res['f1_macro'].idxmax()]
+        
+        # 1. KPI CARDS
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Global Accuracy", f"{best_model['accuracy']:.2%}", delta="State-of-the-Art")
+        c2.metric("F1-Score (Macro)", f"{best_model['f1_macro']:.4f}")
+        c3.metric("Training Time", f"{best_model['train_time_sec']:.2f}s")
+        c4.metric("Model Architecture", best_model['model'])
+        
+        # 2. MODEL HEALTH
+        st.write("Model Health Status:")
+        st.progress(int(best_model['accuracy']*100), text=f"Reliability Index: {best_model['accuracy']*100:.2f}%")
+        
+        st.divider()
+
+    # 3. INTERACTIVE TABS FOR IMAGES
+    tab_cm, tab_roc = st.tabs(["🔍 Confusion Matrix Analysis", "📈 ROC & PR Curves"])
+    
+    with tab_cm:
+        cm_img = "reports/Figure_3_Confusion_Matrix_XGBoost.png"
+        if os.path.exists(cm_img):
+            c_img, c_txt = st.columns([2, 1])
+            with c_img:
+                st.image(cm_img, caption="Multi-Class Confusion Matrix", use_container_width=True)
+            with c_txt:
+                st.info("**How to read this:**\n- The diagonal line represents correct predictions.\n- Off-diagonal elements represent confusion between specific gangs.\n- High values on the diagonal indicate a robust model.")
+        else:
+            st.warning("Confusion Matrix image not found.")
+
+    with tab_roc:
+        roc_img = "reports/Figure_2_ROC_PR_Comparison.png"
+        if os.path.exists(roc_img):
+            st.image(roc_img, caption="Receiver Operating Characteristic (ROC) & Precision-Recall Curves", use_container_width=True)
+        else:
+            st.warning("ROC/PR Curve image not found.")
 
 # --- TAB 3: DOWNLOADS ---
 with tab3:
@@ -526,7 +575,6 @@ with tab4:
             sector_map = {c.replace("victim_sector_", "").replace("sector_", ""): c for c in sector_cols}
             
             st.markdown("### Real-World Scenario Simulator")
-            # Caricamento ottimizzato
             y_val = load_data(os.path.join(DATA_DIR, "y_val.csv"))
             X_val = load_data(os.path.join(DATA_DIR, "X_val.csv"))
             
