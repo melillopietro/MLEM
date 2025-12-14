@@ -9,6 +9,11 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 
+# === HELPER FOR GRAPH OBJECTS ===
+def import_plotly_graph_objects():
+    import plotly.graph_objects as go
+    return go
+
 # === SAFETY LAYER 1: Conditional Import for SHAP (XAI) ===
 try:
     import shap
@@ -24,7 +29,7 @@ except ImportError:
     PLOTLY_AVAILABLE = False
 
 # === CONFIGURATION ===
-st.set_page_config(page_title="MLEM Framework", layout="wide")
+st.set_page_config(page_title="MLEM Framework", layout="wide", page_icon="🛡️")
 
 RESULTS_CSV = "model_comparison_results_final.csv"
 FEATURES_CONFIG = "features_config.json"
@@ -33,6 +38,13 @@ ENCODER_FILE = "label_encoder.pkl"
 DATA_DIR = "./dataset_split"
 RAW_DATASET_XLSX = "Dataset Ransomware.xlsx"
 RAW_DATASET_CSV = "Dataset Normalized.csv"
+
+# === PERFORMANCE CACHING (Sfrutta i 64GB RAM) ===
+@st.cache_data(show_spinner=False)
+def load_data(filepath):
+    if os.path.exists(filepath):
+        return pd.read_csv(filepath)
+    return None
 
 st.title("MLEM: Ransomware Attribution Framework")
 st.markdown("**Advanced Hybrid Profiling & Forensic Attribution System**")
@@ -54,6 +66,7 @@ def run_command(cmd_args, log_box):
 # === SIDEBAR ===
 with st.sidebar:
     st.header("Control Panel")
+    st.caption("🚀 Hardware Acceleration: ENABLED (Full Data Mode)")
     
     st.markdown("### 1. Data Source")
     source = st.radio("Source:", ["Default Dataset", "Local Upload"], label_visibility="collapsed")
@@ -77,9 +90,11 @@ with st.sidebar:
     
     st.divider()
     if st.button("RESET SYSTEM CACHE"):
+        # Pulisce cache RAM e file
+        st.cache_data.clear()
         for f in [RESULTS_CSV, MODEL_FILE, ENCODER_FILE, FEATURES_CONFIG, "RandomForest_best_model.pkl"]:
             if os.path.exists(f): os.remove(f)
-        st.warning("Cache cleared. Please restart the pipeline.")
+        st.warning("System cache & RAM cleared. Please restart the pipeline.")
 
 # === TABS ===
 tab1, tab2, tab3, tab4 = st.tabs(["Pipeline Execution", "Results & Intelligence", "Downloads", "Forensic Investigator"])
@@ -108,6 +123,8 @@ with tab1:
                 if os.path.exists("final_fixed.py"): run_command("final_fixed.py", s)
                 if os.path.exists("generate_final_graphs.py"): run_command("generate_final_graphs.py", s)
                 s.update(label="Analysis Completed", state="complete")
+        
+        st.cache_data.clear() # Ricarica i nuovi dati generati
         st.success("Pipeline executed successfully.")
 
 # --- TAB 2: RESULTS ---
@@ -130,25 +147,29 @@ with tab2:
 
     st.divider()
 
-    # 2. CYBER THREAT GLOBE (3D INTERACTIVE)
+    # 2. CYBER THREAT GLOBE (3D INTERACTIVE) - FULL POWER MODE
     st.subheader("Global Threat Intelligence Center")
-    st.markdown("Real-time visualization of Ransomware Victimology density.")
+    st.markdown("Real-time visualization of Ransomware Victimology density (Full Dataset Analysis).")
     
     if PLOTLY_AVAILABLE:
         try:
             map_source_file = os.path.join(DATA_DIR, "X_train.csv")
-            if os.path.exists(map_source_file):
-                X_map = pd.read_csv(map_source_file)
+            X_map = load_data(map_source_file)
+            
+            if X_map is not None:
                 country_cols = [c for c in X_map.columns if "country" in c]
                 
                 if country_cols:
-                    if len(X_map) > 5000: X_map_sample = X_map.sample(5000, random_state=42)
-                    else: X_map_sample = X_map
+                    # === FULL POWER MODE: NO SAMPLING ===
+                    X_map_sample = X_map 
+                    # ====================================
 
                     active_countries = []
-                    for col in country_cols:
-                        count = X_map_sample[col].sum()
-                        if count > 0:
+                    # Ottimizzazione calcolo vettoriale
+                    country_sums = X_map_sample[country_cols].sum().sort_values(ascending=False)
+                    
+                    for col, count in country_sums.items():
+                         if count > 0:
                             clean_name = col.replace("victim_country_", "").replace("country_", "")
                             active_countries.extend([clean_name] * int(count))
                     
@@ -160,7 +181,7 @@ with tab2:
                         fig_map = px.choropleth(
                             map_counts, locations="Nation", locationmode='country names',
                             color="Attacks", hover_name="Nation",
-                            color_continuous_scale="Reds", title="<b>LIVE ATTACK DENSITY</b>",
+                            color_continuous_scale="Reds", title="<b>LIVE ATTACK DENSITY (2020-2024)</b>",
                             projection="orthographic"
                         )
                         fig_map.update_layout(
@@ -173,7 +194,7 @@ with tab2:
                         col_map, col_list = st.columns([3, 1])
                         with col_map: st.plotly_chart(fig_map, use_container_width=True)
                         with col_list:
-                            st.markdown("####  Top Targets")
+                            st.markdown("#### 🎯 Top Targets (All Time)")
                             st.dataframe(map_counts.head(10).style.background_gradient(cmap="Reds"), hide_index=True, use_container_width=True)
                     else: st.warning("No geographic data found.")
                 else: st.warning("Dataset missing 'country' columns.")
@@ -188,12 +209,14 @@ with tab2:
     
     if PLOTLY_AVAILABLE:
         try:
-            if os.path.exists(os.path.join(DATA_DIR, "X_train.csv")) and os.path.exists(os.path.join(DATA_DIR, "y_train.csv")):
-                X_h = pd.read_csv(os.path.join(DATA_DIR, "X_train.csv"))
-                y_h = pd.read_csv(os.path.join(DATA_DIR, "y_train.csv"))
-                
+            X_h = load_data(os.path.join(DATA_DIR, "X_train.csv"))
+            y_h = load_data(os.path.join(DATA_DIR, "y_train.csv"))
+            
+            if X_h is not None and y_h is not None:
                 df_heat = X_h.copy()
                 df_heat['Gang'] = y_h['label_gang']
+                
+                # Top 10 Gangs più attive
                 top_gangs = df_heat['Gang'].value_counts().head(10).index
                 df_heat_top = df_heat[df_heat['Gang'].isin(top_gangs)]
                 ttp_cols_heat = [c for c in df_heat.columns if (c.startswith("T") and c[1].isdigit())]
@@ -219,38 +242,40 @@ with tab2:
     st.subheader("Threat Actor Profiling System")
     st.markdown("Automated generation of behavioral profiles based on historical data.")
     
-    if os.path.exists(os.path.join(DATA_DIR, "y_train.csv")):
-        y_prof = pd.read_csv(os.path.join(DATA_DIR, "y_train.csv"))
+    y_prof = load_data(os.path.join(DATA_DIR, "y_train.csv"))
+    if y_prof is not None:
         all_gangs = sorted(y_prof['label_gang'].unique())
         
         col_sel, col_stats = st.columns([1, 3])
         with col_sel: selected_gang = st.selectbox("Select Threat Actor:", all_gangs)
         
         with col_stats:
-            if selected_gang and os.path.exists(os.path.join(DATA_DIR, "X_train.csv")):
+            X_prof = load_data(os.path.join(DATA_DIR, "X_train.csv"))
+            if selected_gang and X_prof is not None:
                 indices = y_prof[y_prof['label_gang'] == selected_gang].index
-                X_prof = pd.read_csv(os.path.join(DATA_DIR, "X_train.csv")).iloc[indices]
+                # Ottimizzazione: slice dataframe
+                X_prof_gang = X_prof.iloc[indices]
                 
-                sec_cols = [c for c in X_prof.columns if "sector" in c]
-                top_sectors = X_prof[sec_cols].sum().sort_values(ascending=False).head(3)
+                sec_cols = [c for c in X_prof_gang.columns if "sector" in c]
+                top_sectors = X_prof_gang[sec_cols].sum().sort_values(ascending=False).head(3)
                 
-                cnt_cols = [c for c in X_prof.columns if "country" in c]
-                top_countries = X_prof[cnt_cols].sum().sort_values(ascending=False).head(3)
+                cnt_cols = [c for c in X_prof_gang.columns if "country" in c]
+                top_countries = X_prof_gang[cnt_cols].sum().sort_values(ascending=False).head(3)
                 
-                tech_cols = [c for c in X_prof.columns if c.startswith("T") and c[1].isdigit()]
-                top_techs = X_prof[tech_cols].sum().sort_values(ascending=False).head(5)
+                tech_cols = [c for c in X_prof_gang.columns if c.startswith("T") and c[1].isdigit()]
+                top_techs = X_prof_gang[tech_cols].sum().sort_values(ascending=False).head(5)
 
                 c1, c2, c3 = st.columns(3)
                 with c1:
-                    st.markdown("** Preferred Sectors**")
+                    st.markdown("**🎯 Preferred Sectors**")
                     if not top_sectors.empty and top_sectors.max() > 0:
                         for idx, val in top_sectors.items():
                             name = idx.replace("victim_sector_", "").replace("sector_", "")
-                            st.progress(int(val/len(X_prof)*100), text=f"{name}")
+                            st.progress(int(val/len(X_prof_gang)*100), text=f"{name}")
                     else: st.write("No distinct sector pattern.")
 
                 with c2:
-                    st.markdown("** Preferred Targets**")
+                    st.markdown("**🌍 Preferred Targets**")
                     if not top_countries.empty and top_countries.max() > 0:
                         for idx, val in top_countries.items():
                             name = idx.replace("victim_country_", "").replace("country_", "")
@@ -262,21 +287,26 @@ with tab2:
                     for idx, val in top_techs.items(): st.code(idx, language="text")
     st.divider()
 
-    # 5. SCIENTIFIC CLUSTERING (PCA Visualization)
+    # 5. SCIENTIFIC CLUSTERING (PCA Visualization) - FULL POWER
     st.subheader("Gang Similarity Clusters (PCA Projection)")
     st.markdown("2D projection of the high-dimensional feature space to visualize logical distance between groups.")
     
     if PLOTLY_AVAILABLE:
         try:
             from sklearn.decomposition import PCA
+            X_pca = load_data(os.path.join(DATA_DIR, "X_train.csv"))
+            y_pca = load_data(os.path.join(DATA_DIR, "y_train.csv"))
             
-            if os.path.exists(os.path.join(DATA_DIR, "X_train.csv")) and os.path.exists(os.path.join(DATA_DIR, "y_train.csv")):
-                X_pca = pd.read_csv(os.path.join(DATA_DIR, "X_train.csv"))
-                y_pca = pd.read_csv(os.path.join(DATA_DIR, "y_train.csv"))
-                
+            if X_pca is not None and y_pca is not None:
                 df_pca = X_pca.copy()
                 df_pca['Label'] = y_pca['label_gang']
-                if len(df_pca) > 1000: df_pca = df_pca.sample(1000, random_state=42)
+                
+                # === FULL POWER MODE ===
+                if len(df_pca) > 10000: 
+                    df_pca = df_pca.sample(10000, random_state=42)
+                else:
+                    df_pca = df_pca # Usa tutto se < 10k
+                # =======================
                 
                 features_only = df_pca.drop(columns=['Label'])
                 pca = PCA(n_components=2)
@@ -307,10 +337,10 @@ with tab2:
     
     if PLOTLY_AVAILABLE:
         try:
-            if os.path.exists(os.path.join(DATA_DIR, "X_train.csv")) and os.path.exists(os.path.join(DATA_DIR, "y_train.csv")):
-                X_s = pd.read_csv(os.path.join(DATA_DIR, "X_train.csv"))
-                y_s = pd.read_csv(os.path.join(DATA_DIR, "y_train.csv"))
-                
+            X_s = load_data(os.path.join(DATA_DIR, "X_train.csv"))
+            y_s = load_data(os.path.join(DATA_DIR, "y_train.csv"))
+            
+            if X_s is not None and y_s is not None:
                 tech_cols_only = [c for c in X_s.columns if (c.startswith("T") and c[1].isdigit())]
                 df_soph = pd.DataFrame()
                 df_soph['Gang'] = y_s['label_gang']
@@ -331,8 +361,118 @@ with tab2:
         except Exception as e: st.warning(f"Sophistication Analysis Error: {e}")
 
     st.divider()
+    
+    # 7. ADVANCED NETWORK FORENSICS (GRAPH THEORY)
+    st.subheader("Threat Actor Network Topology")
+    st.markdown("Graph-based visualization of relationships between Ransomware families based on TTP similarity.")
+    
+    if st.checkbox("Enable High-Performance Graph Computation (Uses ~4GB RAM)", value=True):
+        if PLOTLY_AVAILABLE:
+            try:
+                import networkx as nx
+                from sklearn.metrics.pairwise import cosine_similarity
+                
+                st.info("🚀 Processing Similarity Matrix on full dataset...")
+                
+                # Carichiamo i dati
+                X_net = load_data(os.path.join(DATA_DIR, "X_train.csv"))
+                y_net = load_data(os.path.join(DATA_DIR, "y_train.csv"))
+                
+                if X_net is not None and y_net is not None:
+                    df_net = X_net.copy()
+                    df_net['Gang'] = y_net['label_gang']
+                    
+                    # Raggruppa per gang e calcola la media
+                    gang_profiles = df_net.groupby('Gang').mean()
+                    
+                    # Calcolo Matrice di Similarità
+                    sim_matrix = cosine_similarity(gang_profiles)
+                    
+                    G = nx.Graph()
+                    gang_names = gang_profiles.index.tolist()
+                    
+                    for gang in gang_names:
+                        G.add_node(gang)
+                    
+                    threshold = 0.85 
+                    rows, cols = np.where(sim_matrix > threshold)
+                    
+                    for r, c in zip(rows, cols):
+                        if r < c:
+                            weight = sim_matrix[r, c]
+                            G.add_edge(gang_names[r], gang_names[c], weight=weight)
+                    
+                    pos = nx.spring_layout(G, k=0.5, seed=42)
+                    
+                    edge_x = []
+                    edge_y = []
+                    for edge in G.edges():
+                        x0, y0 = pos[edge[0]]
+                        x1, y1 = pos[edge[1]]
+                        edge_x.extend([x0, x1, None])
+                        edge_y.extend([y0, y1, None])
 
-    # 7. GLOBAL FEATURE IMPORTANCE
+                    edge_trace = import_plotly_graph_objects().Scatter(
+                        x=edge_x, y=edge_y,
+                        line=dict(width=0.5, color='#888'),
+                        hoverinfo='none',
+                        mode='lines')
+
+                    node_x = []
+                    node_y = []
+                    node_text = []
+                    node_adj = []
+                    
+                    for node in G.nodes():
+                        x, y = pos[node]
+                        node_x.append(x)
+                        node_y.append(y)
+                        node_text.append(node)
+                        node_adj.append(len(G.adj[node])) 
+
+                    node_trace = import_plotly_graph_objects().Scatter(
+                        x=node_x, y=node_y,
+                        mode='markers+text',
+                        hoverinfo='text',
+                        text=node_text,
+                        textposition="top center",
+                        marker=dict(
+                            showscale=True,
+                            colorscale='YlGnBu',
+                            reversescale=True,
+                            color=node_adj,
+                            size=15,
+                            colorbar=dict(
+                                thickness=15,
+                                title=dict(text='Node Connections', side='right'),
+                                xanchor='left'
+                            ),
+                            line_width=2))
+
+                    fig_net = import_plotly_graph_objects().Figure(data=[edge_trace, node_trace],
+                                layout=import_plotly_graph_objects().Layout(
+                                    title=dict(
+                                        text='<b>Ransomware Ecosystem Topology</b>',
+                                        font=dict(size=16)
+                                    ),
+                                    showlegend=False,
+                                    hovermode='closest',
+                                    margin=dict(b=20,l=5,r=5,t=40),
+                                    template="plotly_dark",
+                                    height=600,
+                                    xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False))
+                                    )
+                    
+                    st.plotly_chart(fig_net, use_container_width=True)
+                    st.caption(f"Network Analysis processed on {len(gang_names)} unique Threat Actors. Connections indicate >{threshold*100}% behavioral similarity.")
+                    
+            except Exception as e:
+                st.warning(f"Network Graph Error: {e}. (Requires networkx library)")
+
+    st.divider()
+
+    # 8. GLOBAL FEATURE IMPORTANCE
     st.subheader("Global Explainability (Top Discriminative Features)")
     
     if PLOTLY_AVAILABLE and os.path.exists(MODEL_FILE) and os.path.exists(FEATURES_CONFIG):
@@ -348,7 +488,7 @@ with tab2:
 
     st.divider()
 
-    # 8. STATIC REPORTS
+    # 9. STATIC REPORTS
     st.subheader("Statistical Reports")
     cols = st.columns(2)
     imgs = ["Figure_2_ROC_PR_Comparison.png", "Figure_3_Confusion_Matrix_XGBoost.png"]
@@ -386,9 +526,11 @@ with tab4:
             sector_map = {c.replace("victim_sector_", "").replace("sector_", ""): c for c in sector_cols}
             
             st.markdown("### Real-World Scenario Simulator")
-            if os.path.exists(os.path.join(DATA_DIR, "y_val.csv")):
-                y_val = pd.read_csv(os.path.join(DATA_DIR, "y_val.csv"))
-                X_val = pd.read_csv(os.path.join(DATA_DIR, "X_val.csv"))
+            # Caricamento ottimizzato
+            y_val = load_data(os.path.join(DATA_DIR, "y_val.csv"))
+            X_val = load_data(os.path.join(DATA_DIR, "X_val.csv"))
+            
+            if y_val is not None and X_val is not None:
                 top_gangs = y_val['label_gang'].value_counts().head(20).index.tolist()
                 target_gang = st.selectbox("Load Threat Actor Profile:", ["Select..."] + top_gangs)
                 
