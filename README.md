@@ -1,63 +1,48 @@
-# MLEM: Hybrid Ransomware Attribution Framework
+# 🛡️ MLEM: Ransomware Attribution Framework
+### Advanced Hybrid Profiling & Forensic Attribution System
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.30%2B-red)
-![Machine Learning](https://img.shields.io/badge/ML-XGBoost%20%7C%20ScikitLearn-green)
-![License](https://img.shields.io/badge/License-MIT-grey)
+![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?style=for-the-badge&logo=streamlit)
+![Status](https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
+## 📖 Overview
+**MLEM (Machine Learning for Enterprise Malware)** is an automated forensic framework designed to attribute ransomware attacks to specific Threat Actors (Gangs) based on their **TTPs (Tactics, Techniques, and Procedures)**.
 
-**MLEM** is an advanced Cyber Threat Intelligence (CTI) framework designed to attribute Ransomware-as-a-Service (RaaS) attacks to specific threat groups. By leveraging a **Hybrid Profiling** approach, the system combines technical behavioral signatures (MITRE ATT&CK TTPs) with contextual victimology data (Industrial Sector and Geography) to achieve high-precision forensic attribution.
+Leveraging a dataset of over **18,600 real-world incidents** (2020-2025), the system utilizes **XGBoost, SVM, and Deep Learning** to map attack patterns against the **MITRE ATT&CK Enterprise Matrix**. Unlike traditional signature-based detection, MLEM analyzes behavioral vectors to identify actors even when infrastructure changes.
 
-The framework utilizes **XGBoost** for classification on highly sparse datasets and integrates **SHAP (SHapley Additive exPlanations)** to provide granular, interpretable evidence for every attribution decision, eliminating the "black box" problem in AI-driven forensics.
-
----
-
-## Key Features
-
-* **Hybrid Profiling Engine:** Integrates technical artifacts (TTPs) with victimology metadata. Statistical ablation studies demonstrate that this hybrid approach improves attribution performance by **+5.24%** compared to purely technical baselines.
-* **State-of-the-Art Classification:** Built on XGBoost (eXtreme Gradient Boosting), optimized for sparse matrices and imbalanced multi-class datasets (handling over 50 distinct ransomware families).
-* **Explainable AI (XAI):**
-    * **Global Explainability:** Identifies top discriminative features across the entire threat landscape.
-    * **Local Forensics:** Provides instance-level SHAP waterfall charts to justify specific attribution decisions.
-* **Geospatial Intelligence:** Interactive 3D visualization mapping global victim distribution against active threat actors.
-* **Automated Scientific Validation:** Includes a suite of scripts for Stratified K-Fold Cross-Validation, Ablation Studies, and generation of engineering-grade reports (including MCC, Kappa, and Sparsity analysis).
+### 🎯 Key Capabilities
+* **Multi-Architecture Benchmarking:** Automated training & comparison of XGBoost, Random Forest, SVM, KNN, and MLP Neural Networks.
+* **Forensic Intelligence Dashboard:** Real-time visualization of attack flows (Sankey), geographic density, and TTP heatmaps.
+* **RaaS Detection Engine:** Graph Theory analysis to identify "Copycat Gangs" (100% similarity) indicating shared Ransomware-as-a-Service infrastructure.
+* **Granular Explainability:** Local **SHAP (SHapley Additive exPlanations)** analysis to explain *why* a specific attribution was made.
+* **Automated Reporting V3:** Generates university-grade PDF technical reports with per-class precision/recall metrics.
+* **Offline Knowledge Base:** Integrated search engine for MITRE ATT&CK definitions.
 
 ---
 
-## Technical Architecture
+## 📊 Performance Benchmarks (2025 Dataset)
+The framework has been tested on a proprietary dataset exhibiting high class imbalance (Power-Law distribution).
 
-The pipeline consists of three main stages:
+| Model Architecture | Accuracy (Global) | F1-Score (Macro) | Training Time | Verdict |
+| :--- | :---: | :---: | :---: | :--- |
+| **XGBoost (Champion)** | **99.56%** | **0.9882** | 78.27s | 🏆 **SOTA** |
+| Random Forest | 99.27% | 0.9706 | 2.69s | Efficient |
+| SVM (Kernel RBF) | 99.03% | 0.9700 | 19.72s | Robust |
+| Neural Net (MLP) | 98.73% | 0.9506 | 28.99s | Good |
+| LightGBM | 31.56% | 0.2214 | 10.72s | Underfitting |
 
-1.  **Preprocessing & Vectorization:** Converts raw CTI reports into a normalized feature vector space. Handles categorical encoding for victim sectors and countries.
-2.  **Model Training & Optimization:** Trains an ensemble of decision trees using Gradient Boosting. Hyperparameters are tuned to minimize log-loss while maximizing the Macro F1-Score.
-3.  **Forensic Dashboard:** A Streamlit-based interface for analysts to interact with the model, simulate attacks, and visualize intelligence data.
+> **Note:** F1-Macro was prioritized over Accuracy to ensure correct classification of emerging/minority ransomware gangs.
 
 ---
 
-## Installation
+## 🛠️ Installation & Setup
 
 ### Prerequisites
-* Python 3.10 or higher (Python 3.12 recommended)
-* pip package manager
+* Python 3.10 or higher (3.12 recommended)
+* 64-bit Architecture (for large dataset processing)
 
-### Setup
-1.  Clone the repository:
-    ```bash
-    git clone [https://github.com/your-username/mlem-attribution.git](https://github.com/your-username/mlem-attribution.git)
-    cd mlem-attribution
-    ```
-
-2.  Install dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
----
-
-## Usage
-
-### 1. Launching the Dashboard
-The primary interface is the web-based dashboard. To start the system:
-
+### 1. Clone the Repository
 ```bash
-python -m streamlit run dashboard.py
+git clone [https://github.com/your-repo/mlem-framework.git](https://github.com/your-repo/mlem-framework.git)
+cd mlem-framework
