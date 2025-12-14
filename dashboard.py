@@ -16,7 +16,7 @@ try:
 except ImportError:
     SHAP_AVAILABLE = False
 
-# === SAFETY LAYER 2: Conditional Import for PLOTLY (Maps) ===
+# === SAFETY LAYER 2: Conditional Import for PLOTLY (Maps/Heatmaps) ===
 try:
     import plotly.express as px
     PLOTLY_AVAILABLE = True
@@ -24,7 +24,6 @@ except ImportError:
     PLOTLY_AVAILABLE = False
 
 # === CONFIGURATION ===
-# Layout wide, formal title, standard favicon
 st.set_page_config(page_title="MLEM Framework", layout="wide")
 
 RESULTS_CSV = "model_comparison_results_final.csv"
@@ -99,7 +98,6 @@ with tab1:
             with st.status(f"Training Models (Trees: {n_estimators}, Depth: {max_depth})...", expanded=True) as s:
                 cmd = ["training_manager.py", "--n_estimators", str(n_estimators), "--max_depth", str(max_depth)]
                 run_command(cmd, s)
-                # Run Neural Networks if available
                 if os.path.exists("NN_new.py"): 
                     try: import tensorflow; run_command("NN_new.py", s)
                     except: pass
@@ -132,76 +130,225 @@ with tab2:
 
     st.divider()
 
-    # 2. CYBER THREAT MAP
-    st.subheader("Global Victimology Map (Geospatial Analysis)")
+    # 2. CYBER THREAT GLOBE (3D INTERACTIVE)
+    st.subheader("Global Threat Intelligence Center")
+    st.markdown("Real-time visualization of Ransomware Victimology density.")
     
     if PLOTLY_AVAILABLE:
         try:
-            if os.path.exists(os.path.join(DATA_DIR, "X_val.csv")):
-                X_val_map = pd.read_csv(os.path.join(DATA_DIR, "X_val.csv"))
-                country_cols = [c for c in X_val_map.columns if "country" in c]
+            map_source_file = os.path.join(DATA_DIR, "X_train.csv")
+            if os.path.exists(map_source_file):
+                X_map = pd.read_csv(map_source_file)
+                country_cols = [c for c in X_map.columns if "country" in c]
                 
                 if country_cols:
-                    def get_country(row):
-                        for c in country_cols:
-                            if row[c] == 1: return c.replace("victim_country_", "").replace("country_", "")
-                        return None
+                    if len(X_map) > 5000: X_map_sample = X_map.sample(5000, random_state=42)
+                    else: X_map_sample = X_map
 
-                    map_data = X_val_map.copy()
-                    if len(map_data) > 2000: map_data = map_data.sample(2000)
+                    active_countries = []
+                    for col in country_cols:
+                        count = X_map_sample[col].sum()
+                        if count > 0:
+                            clean_name = col.replace("victim_country_", "").replace("country_", "")
+                            active_countries.extend([clean_name] * int(count))
                     
-                    map_data['Nation'] = map_data.apply(get_country, axis=1)
-                    counts = map_data['Nation'].value_counts().reset_index()
-                    counts.columns = ['Nation', 'Attacks']
-                    counts = counts[counts['Nation'].notna()]
+                    map_df = pd.DataFrame(active_countries, columns=['Nation'])
+                    map_counts = map_df['Nation'].value_counts().reset_index()
+                    map_counts.columns = ['Nation', 'Attacks']
 
-                    if not counts.empty:
+                    if not map_counts.empty:
                         fig_map = px.choropleth(
-                            counts, locations="Nation", locationmode='country names',
+                            map_counts, locations="Nation", locationmode='country names',
                             color="Attacks", hover_name="Nation",
-                            color_continuous_scale=px.colors.sequential.Reds,
-                            title="Global Distribution of Ransomware Victims (Validation Set)"
+                            color_continuous_scale="Reds", title="<b>LIVE ATTACK DENSITY</b>",
+                            projection="orthographic"
                         )
-                        st.plotly_chart(fig_map, use_container_width=True)
-                    else: st.warning("No geographic data found for visualization.")
-        except Exception as e: st.warning(f"Map rendering error: {e}")
-    else:
-        st.warning("Plotly library not installed. Map visualization disabled.")
+                        fig_map.update_layout(
+                            template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)",
+                            geo=dict(showframe=False, showcoastlines=True, coastlinecolor="RebeccaPurple",
+                                projection_type='orthographic', showocean=True, oceancolor="rgb(10, 10, 20)",
+                                showlakes=True, lakecolor="rgb(10, 10, 20)", landcolor="rgb(30, 30, 40)", bgcolor="rgba(0,0,0,0)"),
+                            margin={"r":0,"t":50,"l":0,"b":0}, height=600
+                        )
+                        col_map, col_list = st.columns([3, 1])
+                        with col_map: st.plotly_chart(fig_map, use_container_width=True)
+                        with col_list:
+                            st.markdown("####  Top Targets")
+                            st.dataframe(map_counts.head(10).style.background_gradient(cmap="Reds"), hide_index=True, use_container_width=True)
+                    else: st.warning("No geographic data found.")
+                else: st.warning("Dataset missing 'country' columns.")
+        except Exception as e: st.error(f"Visualization Error: {e}")
+    else: st.warning("Plotly not installed.")
 
     st.divider()
 
-    # 3. GLOBAL FEATURE IMPORTANCE
-    st.subheader("Global Explainability (Top Discriminative Features)")
-    st.caption("Which features are most critical for the model to distinguish between Ransomware groups?")
+    # 3. ADVANCED TACTICAL ANALYSIS (HEATMAP)
+    st.subheader("Tactical Overlap Analysis (TTP Heatmap)")
+    st.markdown("Visual correlation between Ransomware Families and MITRE ATT&CK Techniques.")
     
     if PLOTLY_AVAILABLE:
-        if os.path.exists(MODEL_FILE) and os.path.exists(FEATURES_CONFIG):
-            try:
-                model_glob = joblib.load(MODEL_FILE)
-                with open(FEATURES_CONFIG, 'r') as f: f_list = json.load(f)
+        try:
+            if os.path.exists(os.path.join(DATA_DIR, "X_train.csv")) and os.path.exists(os.path.join(DATA_DIR, "y_train.csv")):
+                X_h = pd.read_csv(os.path.join(DATA_DIR, "X_train.csv"))
+                y_h = pd.read_csv(os.path.join(DATA_DIR, "y_train.csv"))
                 
-                if hasattr(model_glob, "feature_importances_"):
-                    imp_df = pd.DataFrame({
-                        'Feature': f_list,
-                        'Importance': model_glob.feature_importances_
-                    }).sort_values(by='Importance', ascending=False).head(10)
-                    
-                    fig_imp = px.bar(
-                        imp_df, x='Importance', y='Feature', orientation='h',
-                        title="Top 10 Influential Features (XGBoost)",
-                        color='Importance', color_continuous_scale='Viridis'
+                df_heat = X_h.copy()
+                df_heat['Gang'] = y_h['label_gang']
+                top_gangs = df_heat['Gang'].value_counts().head(10).index
+                df_heat_top = df_heat[df_heat['Gang'].isin(top_gangs)]
+                ttp_cols_heat = [c for c in df_heat.columns if (c.startswith("T") and c[1].isdigit())]
+                
+                heatmap_data = df_heat_top.groupby('Gang')[ttp_cols_heat].mean()
+                heatmap_data = heatmap_data.loc[:, (heatmap_data > 0.1).any(axis=0)]
+                
+                if not heatmap_data.empty:
+                    fig_heat = px.imshow(
+                        heatmap_data, labels=dict(x="MITRE Technique", y="Ransomware Family", color="Usage Frequency"),
+                        x=heatmap_data.columns, y=heatmap_data.index,
+                        color_continuous_scale="Viridis", aspect="auto"
                     )
-                    fig_imp.update_layout(yaxis={'categoryorder':'total ascending'})
-                    st.plotly_chart(fig_imp, use_container_width=True)
-                else:
-                    st.info("The current model does not support native feature importance.")
-            except Exception as e: st.warning(f"Feature Importance Error: {e}")
-    else:
-        st.info("Install Plotly to view the feature importance chart.")
+                    fig_heat.update_layout(title="<b>Signature Fingerprinting: Who uses what?</b>", height=500)
+                    st.plotly_chart(fig_heat, use_container_width=True)
+                    st.caption("Insight: Darker areas show distinct techniques. Vertical bands show shared tools (Affiliate Overlap).")
+                else: st.warning("Not enough TTP density.")
+        except Exception as e: st.warning(f"Heatmap Error: {e}")
 
     st.divider()
 
-    # 4. STATIC REPORTS
+    # 4. THREAT ACTOR ENCYCLOPEDIA
+    st.subheader("Threat Actor Profiling System")
+    st.markdown("Automated generation of behavioral profiles based on historical data.")
+    
+    if os.path.exists(os.path.join(DATA_DIR, "y_train.csv")):
+        y_prof = pd.read_csv(os.path.join(DATA_DIR, "y_train.csv"))
+        all_gangs = sorted(y_prof['label_gang'].unique())
+        
+        col_sel, col_stats = st.columns([1, 3])
+        with col_sel: selected_gang = st.selectbox("Select Threat Actor:", all_gangs)
+        
+        with col_stats:
+            if selected_gang and os.path.exists(os.path.join(DATA_DIR, "X_train.csv")):
+                indices = y_prof[y_prof['label_gang'] == selected_gang].index
+                X_prof = pd.read_csv(os.path.join(DATA_DIR, "X_train.csv")).iloc[indices]
+                
+                sec_cols = [c for c in X_prof.columns if "sector" in c]
+                top_sectors = X_prof[sec_cols].sum().sort_values(ascending=False).head(3)
+                
+                cnt_cols = [c for c in X_prof.columns if "country" in c]
+                top_countries = X_prof[cnt_cols].sum().sort_values(ascending=False).head(3)
+                
+                tech_cols = [c for c in X_prof.columns if c.startswith("T") and c[1].isdigit()]
+                top_techs = X_prof[tech_cols].sum().sort_values(ascending=False).head(5)
+
+                c1, c2, c3 = st.columns(3)
+                with c1:
+                    st.markdown("** Preferred Sectors**")
+                    if not top_sectors.empty and top_sectors.max() > 0:
+                        for idx, val in top_sectors.items():
+                            name = idx.replace("victim_sector_", "").replace("sector_", "")
+                            st.progress(int(val/len(X_prof)*100), text=f"{name}")
+                    else: st.write("No distinct sector pattern.")
+
+                with c2:
+                    st.markdown("** Preferred Targets**")
+                    if not top_countries.empty and top_countries.max() > 0:
+                        for idx, val in top_countries.items():
+                            name = idx.replace("victim_country_", "").replace("country_", "")
+                            st.write(f"📍 **{name}**")
+                    else: st.write("Global/Random targeting.")
+
+                with c3:
+                    st.markdown("**🛠️ Key TTPs (Modus Operandi)**")
+                    for idx, val in top_techs.items(): st.code(idx, language="text")
+    st.divider()
+
+    # 5. SCIENTIFIC CLUSTERING (PCA Visualization)
+    st.subheader("Gang Similarity Clusters (PCA Projection)")
+    st.markdown("2D projection of the high-dimensional feature space to visualize logical distance between groups.")
+    
+    if PLOTLY_AVAILABLE:
+        try:
+            from sklearn.decomposition import PCA
+            
+            if os.path.exists(os.path.join(DATA_DIR, "X_train.csv")) and os.path.exists(os.path.join(DATA_DIR, "y_train.csv")):
+                X_pca = pd.read_csv(os.path.join(DATA_DIR, "X_train.csv"))
+                y_pca = pd.read_csv(os.path.join(DATA_DIR, "y_train.csv"))
+                
+                df_pca = X_pca.copy()
+                df_pca['Label'] = y_pca['label_gang']
+                if len(df_pca) > 1000: df_pca = df_pca.sample(1000, random_state=42)
+                
+                features_only = df_pca.drop(columns=['Label'])
+                pca = PCA(n_components=2)
+                components = pca.fit_transform(features_only)
+                
+                fig_df = pd.DataFrame(data=components, columns=['PC1', 'PC2'])
+                fig_df['Gang'] = df_pca['Label'].values
+                
+                fig_cluster = px.scatter(
+                    fig_df, x='PC1', y='PC2', color='Gang',
+                    title="<b>Semantic Similarity Space</b> (Closer points = Similar TTPs/Targets)",
+                    opacity=0.7, hover_data=['Gang'],
+                    color_discrete_sequence=px.colors.qualitative.Bold
+                )
+                fig_cluster.update_layout(
+                    template="plotly_dark", height=500,
+                    xaxis_title="Principal Component 1", yaxis_title="Principal Component 2"
+                )
+                st.plotly_chart(fig_cluster, use_container_width=True)
+                st.caption("Insight: Distinct clusters indicate distinct modus operandi. Overlapping clusters imply strong tactical similarities.")
+        except Exception as e: st.warning(f"Clustering Error: {e}")
+
+    st.divider()
+
+    # 6. ATTACK SOPHISTICATION METRICS
+    st.subheader("Operational Sophistication Analysis")
+    st.markdown("Quantifying the complexity of attacks based on the number of TTPs employed per incident.")
+    
+    if PLOTLY_AVAILABLE:
+        try:
+            if os.path.exists(os.path.join(DATA_DIR, "X_train.csv")) and os.path.exists(os.path.join(DATA_DIR, "y_train.csv")):
+                X_s = pd.read_csv(os.path.join(DATA_DIR, "X_train.csv"))
+                y_s = pd.read_csv(os.path.join(DATA_DIR, "y_train.csv"))
+                
+                tech_cols_only = [c for c in X_s.columns if (c.startswith("T") and c[1].isdigit())]
+                df_soph = pd.DataFrame()
+                df_soph['Gang'] = y_s['label_gang']
+                df_soph['Complexity'] = X_s[tech_cols_only].sum(axis=1)
+                
+                soph_ranking = df_soph.groupby('Gang')['Complexity'].mean().sort_values(ascending=False).head(15)
+                
+                fig_soph = px.bar(
+                    soph_ranking, orientation='h',
+                    x=soph_ranking.values, y=soph_ranking.index,
+                    title="<b>Average Attack Chain Complexity (Top 15 Groups)</b>",
+                    labels={'x': 'Avg. Unique Techniques per Attack', 'y': 'Ransomware Family'},
+                    color=soph_ranking.values, color_continuous_scale="Plasma"
+                )
+                fig_soph.update_layout(yaxis={'categoryorder':'total ascending'})
+                st.plotly_chart(fig_soph, use_container_width=True)
+                st.caption("Insight: Higher complexity often indicates advanced APT-like capabilities (e.g., Conti, LockBit).")
+        except Exception as e: st.warning(f"Sophistication Analysis Error: {e}")
+
+    st.divider()
+
+    # 7. GLOBAL FEATURE IMPORTANCE
+    st.subheader("Global Explainability (Top Discriminative Features)")
+    
+    if PLOTLY_AVAILABLE and os.path.exists(MODEL_FILE) and os.path.exists(FEATURES_CONFIG):
+        try:
+            model_glob = joblib.load(MODEL_FILE)
+            with open(FEATURES_CONFIG, 'r') as f: f_list = json.load(f)
+            if hasattr(model_glob, "feature_importances_"):
+                imp_df = pd.DataFrame({'Feature': f_list, 'Importance': model_glob.feature_importances_}).sort_values(by='Importance', ascending=False).head(10)
+                fig_imp = px.bar(imp_df, x='Importance', y='Feature', orientation='h', title="Top 10 Influential Features (XGBoost)", color='Importance', color_continuous_scale='Viridis')
+                fig_imp.update_layout(yaxis={'categoryorder':'total ascending'})
+                st.plotly_chart(fig_imp, use_container_width=True)
+        except Exception as e: st.warning(f"Feature Importance Error: {e}")
+
+    st.divider()
+
+    # 8. STATIC REPORTS
     st.subheader("Statistical Reports")
     cols = st.columns(2)
     imgs = ["Figure_2_ROC_PR_Comparison.png", "Figure_3_Confusion_Matrix_XGBoost.png"]
@@ -235,11 +382,9 @@ with tab4:
             ttp_cols = [c for c in feat_list if (c.startswith("T") and c[1].isdigit()) or (c.startswith("TA") and c[2].isdigit())]
             country_cols = [c for c in feat_list if "country" in c.lower()]
             sector_cols = [c for c in feat_list if "sector" in c.lower()]
-            
             country_map = {c.replace("victim_country_", "").replace("country_", ""): c for c in country_cols}
             sector_map = {c.replace("victim_sector_", "").replace("sector_", ""): c for c in sector_cols}
             
-            # SIMULATOR
             st.markdown("### Real-World Scenario Simulator")
             if os.path.exists(os.path.join(DATA_DIR, "y_val.csv")):
                 y_val = pd.read_csv(os.path.join(DATA_DIR, "y_val.csv"))
@@ -249,28 +394,22 @@ with tab4:
                 
                 default_ttps = []
                 default_country_idx, default_sector_idx = 0, 0
-                
                 if target_gang != "Select...":
                     idx = np.random.choice(y_val[y_val['label_gang'] == target_gang].index)
                     row = X_val.loc[idx]
                     active = row[row == 1].index.tolist()
                     default_ttps = [c for c in active if c in ttp_cols]
-                    
                     c_found = [c for c in active if "country" in c]
                     if c_found: 
                         clean = c_found[0].replace("victim_country_", "").replace("country_", "")
                         if clean in country_map: default_country_idx = sorted(list(country_map.keys())).index(clean) + 1
-                    
                     s_found = [c for c in active if "sector" in c]
                     if s_found: 
                         clean = s_found[0].replace("victim_sector_", "").replace("sector_", "")
                         if clean in sector_map: default_sector_idx = sorted(list(sector_map.keys())).index(clean) + 1
-                    
                     st.success(f"Profile **{target_gang}** loaded successfully (Sample ID: {idx})")
             
             st.divider()
-
-            # INPUT FORM
             c1, c2 = st.columns([2, 1])
             with c1: sel_ttps = st.multiselect("Observed TTPs (Techniques):", ttp_cols, default=default_ttps)
             with c2: 
@@ -284,8 +423,7 @@ with tab4:
                 if sel_country != "Unknown": vec[0, feat_list.index(country_map[sel_country])] = 1; active_count += 1
                 if sel_sector != "Unknown": vec[0, feat_list.index(sector_map[sel_sector])] = 1; active_count += 1
                 
-                if active_count == 0:
-                    st.error("Please select at least one feature.")
+                if active_count == 0: st.error("Please select at least one feature.")
                 else:
                     input_df = pd.DataFrame(vec, columns=feat_list)
                     probs = model.predict_proba(input_df)[0]
@@ -294,7 +432,6 @@ with tab4:
                     conf = probs[best_idx] * 100
                     
                     st.divider()
-                    
                     if conf < 50.0:
                         st.warning(f"**Result: N/A (Inconclusive Analysis)**")
                         st.markdown(f"Low confidence match for **{raw_gang}** ({conf:.2f}%). Additional evidence required.")
@@ -303,26 +440,20 @@ with tab4:
                         st.markdown(f"### Identified Threat Actor: :{color}[{raw_gang}]")
                         st.metric("Confidence Score", f"{conf:.2f}%")
                         
-                        # LOCAL SHAP (Local XAI)
                         is_tree_model = "XGB" in str(type(model)) or "RandomForest" in str(type(model))
-                        
                         if SHAP_AVAILABLE and is_tree_model:
                             st.subheader("Explainable AI (Local SHAP Analysis)")
                             st.caption(f"Contribution of each feature to the attribution of {raw_gang}.")
-                            
                             with st.spinner("Calculating attribution logic..."):
                                 try:
                                     explainer = shap.TreeExplainer(model)
                                     shap_values = explainer(input_df)
                                     if len(shap_values.shape) == 3: shap_val_class = shap_values[0, :, best_idx]
                                     else: shap_val_class = shap_values[0]
-                                    
-                                    # Create figure
                                     fig, ax = plt.subplots(figsize=(10, 5))
                                     shap.plots.waterfall(shap_val_class, max_display=10, show=False)
                                     st.pyplot(fig)
-                                except Exception as e:
-                                    st.warning(f"SHAP Analysis unavailable: {e}")
+                                except Exception as e: st.warning(f"SHAP Analysis unavailable: {e}")
 
                     with st.expander("View Full Probability Distribution"):
                         top5 = np.argsort(probs)[::-1][:5]
