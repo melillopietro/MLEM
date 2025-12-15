@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 
+
 # === SAFETY IMPORT FOR PLOTLY ===
 try:
     import plotly.express as px
@@ -644,47 +645,188 @@ with tab3:
 # --- TAB 4: INVESTIGATOR ---
 with tab4:
     st.header("Forensic Investigator & Local XAI")
-    if os.path.exists(MODEL_FILE):
+    st.markdown("⚠️ **Operational Mode:** Analyze a new incident or simulate based on historical patterns.")
+
+    if os.path.exists(MODEL_FILE) and os.path.exists(FEATURES_CONFIG) and os.path.exists(ENCODER_FILE):
         try:
-            le = joblib.load(ENCODER_FILE); model = joblib.load(MODEL_FILE)
+            # 1. Caricamento Risorse Critiche
+            le = joblib.load(ENCODER_FILE)
+            model = joblib.load(MODEL_FILE)
             with open(FEATURES_CONFIG, 'r') as f: feat_list = json.load(f)
             
-            ttp_cols = [c for c in feat_list if c.startswith("T") and c[1].isdigit()]
-            c_map = {c.split("_")[-1]: c for c in feat_list if "country" in c}
-            s_map = {c.split("_")[-1]: c for c in feat_list if "sector" in c}
+            # 2. Creazione Mappe Pulite (Fondamentale per evitare errori di mapping)
+            # TTPs: Colonne che iniziano con T e un numero
+            ttp_cols = [c for c in feat_list if (c.startswith("T") and len(c)>1 and c[1].isdigit())]
             
-            y_val = load_data(os.path.join(DATA_DIR, "y_val.csv")); X_val = load_data(os.path.join(DATA_DIR, "X_val.csv"))
-            tgt = st.selectbox("Load Profile:", ["Select..."] + list(y_val['label_gang'].value_counts().head(20).index))
-            
-            d_ttps = []; d_c_idx = 0; d_s_idx = 0
-            if tgt != "Select...":
-                idx = np.random.choice(y_val[y_val['label_gang'] == tgt].index); row = X_val.loc[idx]
-                d_ttps = [c for c in row[row==1].index if c in ttp_cols]
-            
-            c1, c2 = st.columns([2, 1])
-            sel_ttps = c1.multiselect("TTPs:", ttp_cols, default=d_ttps)
-            sel_c = c2.selectbox("Country:", ["Unknown"] + sorted(list(c_map.keys())))
-            sel_s = c2.selectbox("Sector:", ["Unknown"] + sorted(list(s_map.keys())))
-            
-            if st.button("IDENTIFY THREAT ACTOR", type="primary"):
-                vec = np.zeros((1, len(feat_list)))
-                for t in sel_ttps: vec[0, feat_list.index(t)] = 1
-                if sel_c != "Unknown": vec[0, feat_list.index(c_map[sel_c])] = 1
-                if sel_s != "Unknown": vec[0, feat_list.index(s_map[sel_s])] = 1
-                
-                probs = model.predict_proba(pd.DataFrame(vec, columns=feat_list))[0]
-                best = np.argmax(probs); gang = le.inverse_transform([best])[0]; conf = probs[best]*100
-                
-                st.divider()
-                st.markdown(f"### Identified: :{'green' if conf>75 else 'orange'}[{gang}] ({conf:.2f}%)")
-                
-                if SHAP_AVAILABLE and ("XGB" in str(type(model)) or "Forest" in str(type(model))):
-                    st.subheader("Explainability (SHAP)")
-                    explainer = shap.TreeExplainer(model); shap_val = explainer(pd.DataFrame(vec, columns=feat_list))
-                    class_shap = shap_val[0, :, best] if len(shap_val.shape) == 3 else shap_val[0]
-                    fig, ax = plt.subplots(); shap.plots.waterfall(class_shap, show=False); st.pyplot(fig)
-        except Exception as e: st.error(f"Error: {e}")
+            # Countries: Creiamo un dizionario {Nome Pulito: Nome Colonna Originale}
+            # Es: {"Italy": "victim_country_Italy"}
+            c_map = {}
+            for c in feat_list:
+                if "country" in c.lower():
+                    clean_name = c.replace("victim_country_", "").replace("country_", "")
+                    c_map[clean_name] = c
 
+            # Sectors: Stessa cosa per i settori
+            s_map = {}
+            for c in feat_list:
+                if "sector" in c.lower():
+                    clean_name = c.replace("victim_sector_", "").replace("sector_", "")
+                    s_map[clean_name] = c
+
+            # 3. Selezione Modalità
+            mode = st.radio("Select Analysis Mode:", 
+                           ["✍️ Manual Forensic Entry (New Incident)", "📂 Load Historical Profile (Validation)"], 
+                           horizontal=True)
+            
+            st.divider()
+
+            # Variabili di default
+            d_ttps = []; d_c_idx = 0; d_s_idx = 0
+            
+            # --- LOGICA CARICAMENTO PROFILO ESISTENTE ---
+            if mode == "📂 Load Historical Profile (Validation)":
+                if os.path.exists(os.path.join(DATA_DIR, "y_val.csv")) and os.path.exists(os.path.join(DATA_DIR, "X_val.csv")):
+                    y_val = pd.read_csv(os.path.join(DATA_DIR, "y_val.csv"))
+                    X_val = pd.read_csv(os.path.join(DATA_DIR, "X_val.csv"))
+                    
+                    # Filtra solo gang presenti nella validation
+                    available_gangs = y_val['label_gang'].value_counts().head(30).index.tolist()
+                    tgt = st.selectbox("Select Threat Actor to Simulate:", ["Select..."] + available_gangs)
+                    
+                    if tgt != "Select...":
+                        # Prendi un campione a caso
+                        possible_indices = y_val[y_val['label_gang'] == tgt].index
+                        if len(possible_indices) > 0:
+                            idx = np.random.choice(possible_indices)
+                            # Assicuriamoci che l'indice esista in X_val (gestione indici disallineati)
+                            if idx in X_val.index:
+                                row = X_val.loc[idx]
+                                
+                                # Estrai feature attive (=1)
+                                active_feats = row[row == 1].index.tolist()
+                                d_ttps = [c for c in active_feats if c in ttp_cols]
+                                
+                                # Trova Paese
+                                for c in active_feats:
+                                    for clean, original in c_map.items():
+                                        if c == original:
+                                            try: d_c_idx = sorted(list(c_map.keys())).index(clean) + 1
+                                            except: pass
+                                
+                                # Trova Settore
+                                for c in active_feats:
+                                    for clean, original in s_map.items():
+                                        if c == original:
+                                            try: d_s_idx = sorted(list(s_map.keys())).index(clean) + 1
+                                            except: pass
+                                
+                                st.info(f"✅ Loaded Sample ID: {idx} (True Label: {tgt})")
+                            else:
+                                st.warning("Sample index mismatch. Try another gang.")
+
+            # 4. INTERFACCIA DI INPUT
+            c1, c2 = st.columns([2, 1])
+            with c1:
+                st.subheader("1. Tactical Evidence (TTPs)")
+                sel_ttps = st.multiselect("Select Observed Techniques:", ttp_cols, default=d_ttps)
+            with c2:
+                st.subheader("2. Metadata")
+                sel_c = st.selectbox("Victim Country:", ["Unknown"] + sorted(list(c_map.keys())), index=d_c_idx)
+                sel_s = st.selectbox("Victim Sector:", ["Unknown"] + sorted(list(s_map.keys())), index=d_s_idx)
+
+            # 5. MOTORE DI PREDIZIONE (CORRETTO)
+            st.markdown("---")
+            if st.button("🚀 IDENTIFY THREAT ACTOR", type="primary", use_container_width=True):
+                
+                # A. Validazione Input (Anti-AKO)
+                input_is_empty = (len(sel_ttps) == 0) and (sel_c == "Unknown") and (sel_s == "Unknown")
+                
+                if input_is_empty:
+                    st.error("⛔ Input vector is empty! Please select at least one TTP, Country, or Sector.")
+                    st.caption("Sending an empty vector causes the model to output the default bias (often 'AKO').")
+                else:
+                    # B. Costruzione Vettore Sicuro
+                    # Creiamo un DF con tutte le colonne a 0, esattamente nell'ordine di feat_list
+                    input_df = pd.DataFrame(0, index=[0], columns=feat_list)
+                    
+                    # C. Attivazione Feature
+                    active_count = 0
+                    
+                    # TTPs
+                    for t in sel_ttps:
+                        if t in input_df.columns:
+                            input_df.at[0, t] = 1
+                            active_count += 1
+                    
+                    # Country
+                    if sel_c != "Unknown" and sel_c in c_map:
+                        col_name = c_map[sel_c]
+                        if col_name in input_df.columns:
+                            input_df.at[0, col_name] = 1
+                            active_count += 1
+                            
+                    # Sector
+                    if sel_s != "Unknown" and sel_s in s_map:
+                        col_name = s_map[sel_s]
+                        if col_name in input_df.columns:
+                            input_df.at[0, col_name] = 1
+                            active_count += 1
+
+                    # D. Predizione
+                    try:
+                        probs = model.predict_proba(input_df)[0]
+                        best_idx = np.argmax(probs)
+                        gang_name = le.inverse_transform([best_idx])[0]
+                        confidence = probs[best_idx] * 100
+                        
+                        # E. Visualizzazione Risultati
+                        r1, r2 = st.columns([1, 2])
+                        with r1:
+                            st.markdown("### 🎯 Attribution Result")
+                            
+                            # Logica Semaforo
+                            if confidence < 15.0:
+                                st.error(f"**Inconclusive** ({gang_name}?)")
+                                st.caption("Confidence is too low (<15%). This input pattern is unknown to the model.")
+                            else:
+                                color = "green" if confidence > 70 else "orange"
+                                st.markdown(f"**Identified:** :{color}[{gang_name}]")
+                                st.metric("Confidence Score", f"{confidence:.2f}%")
+                            
+                            with st.expander("Secondary Suspects"):
+                                top3 = np.argsort(probs)[::-1][:3]
+                                for i in top3:
+                                    g = le.inverse_transform([i])[0]
+                                    p = probs[i] * 100
+                                    st.write(f"- {g}: {p:.1f}%")
+
+                        with r2:
+                            # F. Explainability (Solo se Tree-based)
+                            is_tree = "XGB" in str(type(model)) or "Forest" in str(type(model))
+                            if SHAP_AVAILABLE and is_tree:
+                                st.subheader("Why this verdict? (SHAP)")
+                                with st.spinner("Analyzing decision path..."):
+                                    explainer = shap.TreeExplainer(model)
+                                    shap_val = explainer(input_df)
+                                    # Fix per shap array dimension
+                                    if isinstance(shap_val, list) or len(shap_val.shape) == 3:
+                                        shap_v = shap_val[0][:, best_idx]
+                                    else:
+                                        shap_v = shap_val[0]
+                                    
+                                    fig, ax = plt.subplots(figsize=(8, 3))
+                                    shap.plots.waterfall(shap_v, max_display=7, show=False)
+                                    st.pyplot(fig)
+
+                    except Exception as e:
+                        st.error(f"Prediction Error: {e}")
+                        st.caption("Hint: Try running the Training Pipeline again to sync columns.")
+                        
+        except Exception as e:
+            st.error(f"Initialization Error: {e}")
+            st.info("Please run the 'Pipeline Execution' (Tab 1) first to generate models and configs.")
+    else:
+        st.warning("⚠️ Files missing. Go to Tab 1 and click 'RUN FULL PIPELINE'.")
 # --- TAB 5: KNOWLEDGE BASE ---
 with tab5:
     st.header("MITRE ATT&CK Knowledge Base")
