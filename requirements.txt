@@ -1,29 +1,23 @@
-# --- Core Data Science ---
-# Blocchiamo numpy sotto la versione 2.0.0 per evitare conflitti con librerie non ancora aggiornate
-numpy>=1.24.0,<2.0.0
-pandas>=2.1.0
-scipy>=1.10.0
-joblib>=1.4.0
+# === Core Application ===
+streamlit>=1.30.0          # Framework per la Dashboard Web
+pandas>=2.0.0              # Manipolazione dati (Dataframes)
+numpy>=1.24.0              # Calcolo numerico e vettoriale
+openpyxl>=3.1.0            # Lettura file Excel (.xlsx)
+requests>=2.31.0           # Download feed CISA/CVE dal governo
 
-# --- Machine Learning Models ---
-scikit-learn>=1.5.0
-xgboost>=2.0.3        # Versione stabile e collaudata
-lightgbm>=4.3.0
+# === Machine Learning & AI ===
+scikit-learn>=1.3.0        # SVM, Random Forest, Preprocessing, Metrics
+xgboost>=2.0.0             # Champion Model (Gradient Boosting)
+lightgbm>=4.0.0            # Modello alternativo (Gradient Boosting)
+tensorflow>=2.15.0         # Reti Neurali (MLP)
+shap>=0.44.0               # Explainable AI (XAI)
 
-# --- Deep Learning (Opzionale) ---
-# TensorFlow è pesante. Se non usi le Reti Neurali nel Tab 1, puoi lasciarlo commentato.
-# tensorflow>=2.16.0
+# === Visualization & Reporting ===
+plotly>=5.18.0             # Grafici interattivi (Mappe, Sankey)
+matplotlib>=3.8.0          # Grafici statici (necessario per SHAP)
+seaborn>=0.13.0            # Heatmap statistiche avanzate (RQ3)
+kaleido>=0.2.1             # Engine per salvare i grafici Plotly come immagini (per il PDF)
+fpdf>=1.7.2                # Generazione Report PDF
 
-# --- Dashboard & Visualizzazione ---
-streamlit>=1.32.0
-plotly>=5.19.0        # FONDAMENTALE per la Threat Map geografica
-matplotlib>=3.8.0
-seaborn>=0.13.0
-
-# --- Explainable AI (XAI) ---
-shap>=0.45.0          # FONDAMENTALE per i grafici a cascata
-
-# --- Gestione File ---
-openpyxl>=3.1.0       # Per leggere i file Excel (.xlsx)
-xlsxwriter>=3.1.0     # Per scrivere/esportare Excel
-tqdm>=4.66.0          # Barre di caricamento per script lunghi
+# === Network Science ===
+networkx>=3.0              # Teoria dei Grafi (RaaS Detection)

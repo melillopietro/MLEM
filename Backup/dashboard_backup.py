@@ -325,13 +325,12 @@ with st.sidebar:
         st.warning("System cache & RAM cleared. Please restart the pipeline.")
 
 # === TABS ===
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-    "Pipeline Execution",
-    "Results & Intelligence",
-    "Downloads",
-    "Forensic Investigator",
-    " MITRE Knowledge Base",
-    " CVE Vulnerability Mapper"  # <--- NUOVA TAB
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "Pipeline Execution", 
+    "Results & Intelligence", 
+    "Downloads", 
+    "Forensic Investigator", 
+    "MITRE Knowledge Base"
 ])
 
 # --- TAB 1: EXECUTION ---
@@ -921,85 +920,3 @@ with tab5:
                 st.rerun()
     else:
         st.warning("Database unavailable.")
-# --- TAB 6: CVE VULNERABILITY MAPPER (REAL-TIME CISA FEED) ---
-with tab6:
-    st.header("CVE ↔ TTP Bridge (CISA KEV Feed)")
-    st.markdown("Live correlation between **CISA Known Exploited Vulnerabilities** and **MITRE ATT&CK**.")
-
-    cve_db_file = "cve_definitions.json"
-    cve_updater = "update_cve_db.py"
-    cve_data = {}
-
-    # 1. Auto-Healing (Scarica dati reali se mancano)
-    if not os.path.exists(cve_db_file):
-        if os.path.exists(cve_updater):
-            with st.status("📥 Downloading CISA Government Feed...", expanded=True) as s:
-                try:
-                    subprocess.run([sys.executable, cve_updater], check=True)
-                    s.update(label="Database Synced with CISA.gov", state="complete")
-                    time.sleep(0.5)
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Download Failed: {e}")
-        else:
-            st.warning("Updater script missing.")
-
-    # 2. Interfaccia Analisi
-    if os.path.exists(cve_db_file):
-        with open(cve_db_file, "r") as f:
-            cve_data = json.load(f)
-
-        # Filtri Avanzati
-        c1, c2, c3 = st.columns([2, 1, 1])
-        with c1:
-            # Ordina per data più recente
-            sorted_cves = sorted(cve_data.keys(), reverse=True)
-            search_cve = st.selectbox("Select Exploited Vulnerability (CISA KEV):", ["Select..."] + sorted_cves)
-        with c2:
-            st.caption("Database Status")
-            st.success(f"🟢 Online: {len(cve_data)} CVEs")
-        with c3:
-            if st.button("🔄 Sync CISA Feed"):
-                subprocess.run([sys.executable, cve_updater])
-                st.rerun()
-
-        st.divider()
-
-        if search_cve != "Select..." and search_cve in cve_data:
-            info = cve_data[search_cve]
-
-            # Card Principale
-            st.subheader(f"🔴 {search_cve} | {info['name']}")
-
-            m1, m2, m3 = st.columns(3)
-            m1.write(f"**Vendor:** {info.get('vendor', 'N/A')}")
-            m2.write(f"**Product:** {info.get('product', 'N/A')}")
-            m3.write(f"**Discovered:** {info.get('date_added', 'N/A')}")
-
-            st.info(f"**Intelligence Brief:** {info['description']}")
-
-            # IL PONTE EURISTICO -> TTP
-            st.markdown("### 🔗 Mapped Attack Vectors (Heuristic Analysis)")
-            if info['linked_ttps']:
-                st.caption("Based on behavioral pattern matching, this vulnerability enables:")
-                cols = st.columns(4)  # Grid layout
-                for i, ttp in enumerate(info['linked_ttps']):
-                    with cols[i % 4]:
-                        st.code(ttp, language="text")
-                        # Nome TTP da MITRE DB
-                        if os.path.exists("mitre_definitions.json"):
-                            with open("mitre_definitions.json", 'r') as f:
-                                m_db = json.load(f)
-                            if ttp in m_db: st.caption(f"*{m_db[ttp]['name']}*")
-            else:
-                st.warning("No direct MITRE mapping found via heuristic analysis.")
-
-            st.markdown("---")
-            st.caption("Data Source: Cybersecurity and Infrastructure Security Agency (CISA.gov)")
-
-        else:
-            st.info("Select a CVE to analyze the attack path.")
-            # Statistiche del Feed
-            vendors = pd.Series([d.get('vendor') for d in cve_data.values()]).value_counts().head(5)
-            st.markdown("#### Top Targeted Vendors (Live Data)")
-            st.bar_chart(vendors)
