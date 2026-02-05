@@ -50,3 +50,10 @@ models/
 .mypy_cache/
 .dmypy.json
 .pyre/
+
+# PyCharm
+.idea/
+
+# ML serialized models
+*.pkl
+

@@ -1,4 +1,41 @@
 {
+    "CVE-2009-0556": {
+        "name": "Microsoft Office PowerPoint Code Injection Vulnerability",
+        "severity": "Active Exploitation (CISA KEV)",
+        "description": "Microsoft Office PowerPoint contains a code injection vulnerability that allows remote attackers to execute arbitrary code via a PowerPoint file with an OutlineTextRefAtom containing an invalid index value that triggers memory corruption.",
+        "linked_ttps": [
+            "T1053.002"
+        ],
+        "target_sector": "All/Unknown",
+        "vendor": "Microsoft",
+        "product": "Office",
+        "date_added": "2026-01-07"
+    },
+    "CVE-2025-37164": {
+        "name": "Hewlett Packard Enterprise OneView Code Injection Vulnerability",
+        "severity": "Active Exploitation (CISA KEV)",
+        "description": "Hewlett Packard Enterprise OneView contains a code injection vulnerability that allows a remote unauthenticated user to perform remote code execution.",
+        "linked_ttps": [
+            "T1053.002"
+        ],
+        "target_sector": "All/Unknown",
+        "vendor": "Hewlett Packard (HP)",
+        "product": "OneView",
+        "date_added": "2026-01-07"
+    },
+    "CVE-2025-14847": {
+        "name": "MongoDB and MongoDB Server Improper Handling of Length Parameter Inconsistency Vulnerability",
+        "severity": "Active Exploitation (CISA KEV)",
+        "description": "MongoDB Server contains an improper handling of length parameter inconsistency vulnerability in Zlib compressed protocol headers. This vulnerability may allow a read of uninitialized heap memory by an unauthenticated client.",
+        "linked_ttps": [
+            "T1053.002",
+            "T1584.004"
+        ],
+        "target_sector": "All/Unknown",
+        "vendor": "MongoDB",
+        "product": "MongoDB and MongoDB Server",
+        "date_added": "2025-12-29"
+    },
     "CVE-2023-52163": {
         "name": "Digiever DS-2105 Pro Missing Authorization Vulnerability",
         "severity": "Active Exploitation (CISA KEV)",
@@ -28,8 +65,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "ASUS Live Update contains an embedded malicious code vulnerability client were distributed with unauthorized modifications introduced through a supply chain compromise. The modified builds could cause devices meeting specific targeting conditions to perform unintended actions. The impacted product could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
         "linked_ttps": [
-            "T1053.002",
-            "T1195"
+            "T1195",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "ASUS",
@@ -370,8 +407,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Broadcom VMware Aria Operations and VMware Tools contain a privilege defined with unsafe actions vulnerability. A malicious local actor with non-administrative privileges having access to a VM with VMware Tools installed and managed by Aria Operations with SDMP enabled may exploit this vulnerability to escalate privileges to root on the same VM.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.002"
+            "T1588.002",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Broadcom",
@@ -593,8 +630,8 @@
         "description": "Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting vulnerability that exists in the Classic Web Client due to insufficient sanitization of HTML content in ICS files. When a user views an e-mail message containing a malicious ICS entry, its embedded JavaScript executes via an ontoggle event inside a tag. This allows an attacker to run arbitrary JavaScript within the victim's session, potentially leading to unauthorized actions such as setting e-mail filters to redirect messages to an attacker-controlled address. As a result, an attacker can perform unauthorized actions on the victim's account, including e-mail redirection and data exfiltration.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1059.007"
+            "T1059.007",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Synacor",
@@ -816,8 +853,8 @@
         "description": "Cisco Secure Firewall Adaptive Security (ASA) Appliance and Secure Firewall Threat Defense (FTD) Software VPN Web Server contain a missing authorization vulnerability. This vulnerability could be chained with CVE-2025-20333.",
         "linked_ttps": [
             "T1053.002",
-            "T1584.004",
-            "T1592.002"
+            "T1592.002",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Cisco",
@@ -830,8 +867,8 @@
         "description": "Cisco Secure Firewall Adaptive Security (ASA) Appliance and Secure Firewall Threat Defense (FTD) Software VPN Web Server contain a buffer overflow vulnerability that allows for remote code execution. This vulnerability could be chained with CVE-2025-20362.",
         "linked_ttps": [
             "T1053.002",
-            "T1584.004",
-            "T1592.002"
+            "T1592.002",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Cisco",
@@ -1110,8 +1147,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "D-Link DCS-2530L and DCS-2670L devices contains a command injection vulnerability in the cgi-bin/ddns_enc.cgi. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
         "linked_ttps": [
-            "T1053.002",
-            "T1071.004"
+            "T1071.004",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "D-Link",
@@ -1273,9 +1310,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Wing FTP Server contains an improper neutralization of null byte or NUL character vulnerability that can allow injection of arbitrary Lua code into user session files. This can be used to execute arbitrary system commands with the privileges of the FTP service (root or SYSTEM by default).",
         "linked_ttps": [
+            "T1059.011",
             "T1053.002",
-            "T1584.004",
-            "T1059.011"
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Wing FTP Server",
@@ -1515,10 +1552,10 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Erlang Erlang/OTP SSH server contains a missing authentication for critical function vulnerability. This could allow an attacker to execute arbitrary commands without valid credentials, potentially leading to unauthenticated remote code execution (RCE). By exploiting a flaw in how SSH protocol messages are handled, a malicious actor could gain unauthorized access to affected systems. This vulnerability could affect various products that implement Erlang/OTP SSH server, including\u2014but not limited to\u2014Cisco, NetApp, and SUSE.",
         "linked_ttps": [
-            "T1053.002",
+            "T1589.001",
             "T1021.004",
-            "T1584.004",
-            "T1589.001"
+            "T1053.002",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Erlang",
@@ -1542,8 +1579,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Multiple Qualcomm chipsets contain an incorrect authorization vulnerability. This vulnerability allows for memory corruption due to unauthorized command execution in GPU micronode while executing specific sequence of commands.",
         "linked_ttps": [
-            "T1053.002",
-            "T1053.003"
+            "T1053.003",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Qualcomm",
@@ -1555,8 +1592,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Multiple Qualcomm chipsets contain an incorrect authorization vulnerability. This vulnerability allows for memory corruption due to unauthorized command execution in GPU micronode while executing specific sequence of commands.",
         "linked_ttps": [
-            "T1053.002",
-            "T1053.003"
+            "T1053.003",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Qualcomm",
@@ -1665,8 +1702,8 @@
         "description": "Zimbra Collaboration contains a cross-site scripting (XSS) vulnerability in the CalendarInvite feature of the Zimbra webmail classic user interface. An attacker can exploit this vulnerability via an email message containing a crafted calendar header, leading to the execution of arbitrary JavaScript code.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1059.007"
+            "T1059.007",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Synacor",
@@ -1691,9 +1728,9 @@
         "description": "MDaemon Email Server contains a cross-site scripting (XSS) vulnerability that allows a remote attacker to load arbitrary JavaScript code via an HTML e-mail message.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
+            "T1059.007",
             "T1584.004",
-            "T1059.007"
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "MDaemon",
@@ -2181,8 +2218,8 @@
         "description": "SAP NetWeaver Application Server (AS) Java contains a directory traversal vulnerability in scheduler/ui/js/ffffffffbca41eb4/UIUtilJavaScriptJS that allows a remote attacker to read arbitrary files via a .. (dot dot) in the query string.",
         "linked_ttps": [
             "T1053.002",
-            "T1584.004",
-            "T1059.007"
+            "T1059.007",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "SAP",
@@ -2327,8 +2364,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Microsoft Windows Management Console (MMC) contains an improper neutralization vulnerability that allows an unauthorized attacker to bypass a security feature locally.",
         "linked_ttps": [
-            "T1053.002",
-            "T1218.014"
+            "T1218.014",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -2622,9 +2659,9 @@
         "description": "SimpleHelp remote support software contains multiple path traversal vulnerabilities that allow unauthenticated remote attackers to download arbitrary files from the SimpleHelp host via crafted HTTP requests. These files may include server configuration files and hashed user passwords.",
         "linked_ttps": [
             "T1053.002",
-            "T1588.006",
+            "T1592.002",
             "T1584.004",
-            "T1592.002"
+            "T1588.006"
         ],
         "target_sector": "All/Unknown",
         "vendor": "SimpleHelp ",
@@ -2757,8 +2794,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Dante Discovery contains a process control vulnerability in mDNSResponder.exe that all allows for a DLL sideloading attack. A local attacker can leverage this vulnerability in the Dante Application Library to execute arbitrary code.",
         "linked_ttps": [
-            "T1053.002",
             "T1071.004",
+            "T1053.002",
             "T1574.001"
         ],
         "target_sector": "All/Unknown",
@@ -2942,8 +2979,8 @@
         "description": "Qlik Sense contains an HTTP tunneling vulnerability that allows an attacker to escalate privileges and execute HTTP requests on the backend server hosting the software.",
         "linked_ttps": [
             "T1053.002",
-            "T1584.004",
-            "T1592.002"
+            "T1592.002",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Qlik",
@@ -3019,8 +3056,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Palo Alto Networks PAN-OS contains a vulnerability in parsing and logging malicious DNS packets in the DNS Security feature that, when exploited, allows an unauthenticated attacker to remotely reboot the firewall. Repeated attempts to trigger this condition will cause the firewall to enter maintenance mode.",
         "linked_ttps": [
-            "T1053.002",
-            "T1071.004"
+            "T1071.004",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Palo Alto Networks",
@@ -3105,8 +3142,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Cleo Harmony, VLTrader, and LexiCom, which are managed file transfer products, contain an unrestricted file upload vulnerability that could allow an unauthenticated user to import and execute arbitrary bash or PowerShell commands on the host system by leveraging the default settings of the Autorun directory.",
         "linked_ttps": [
-            "T1053.002",
-            "T1086"
+            "T1086",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Cleo",
@@ -3488,8 +3525,8 @@
         "description": "RoundCube Webmail contains a cross-site scripting (XSS) vulnerability in the handling of SVG animate attributes that allows a remote attacker to run malicious JavaScript code.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1059.007"
+            "T1059.007",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Roundcube",
@@ -3707,8 +3744,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "DrayTek Vigor3900, Vigor2960, and Vigor300B devices contain an OS command injection vulnerability in cgi-bin/mainfunction.cgi/cvmcfgupload that allows for remote code execution via shell metacharacters in a filename when the text/x-python-script content type is used.",
         "linked_ttps": [
-            "T1053.002",
-            "T1059.006"
+            "T1059.006",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "DrayTek",
@@ -4248,8 +4285,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Acronis Cyber Infrastructure (ACI) allows an unauthenticated user to execute commands remotely due to the use of default passwords.",
         "linked_ttps": [
-            "T1053.002",
-            "T1053.003"
+            "T1053.003",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Acronis",
@@ -4273,8 +4310,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "ServiceNow Utah, Vancouver, and Washington DC Now Platform releases contain a jelly template injection vulnerability in UI macros. An unauthenticated user could exploit this vulnerability to execute code remotely. ",
         "linked_ttps": [
-            "T1053.002",
-            "T1221"
+            "T1221",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "ServiceNow",
@@ -4348,10 +4385,10 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "OSGeo GeoServer GeoTools contains an improper neutralization of directives in dynamically evaluated code vulnerability due to unsafely evaluating property names as XPath expressions. This allows unauthenticated attackers to conduct remote code execution via specially crafted input.",
         "linked_ttps": [
-            "T1053.002",
-            "T1584.004",
             "T1059.011",
-            "T1588.002"
+            "T1588.002",
+            "T1053.002",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "OSGeo",
@@ -4780,8 +4817,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "D-Link DNS-320L, DNS-325, DNS-327L, and DNS-340L contains a hard-coded credential that allows an attacker to conduct authenticated command injection, leading to remote, unauthorized code execution.",
         "linked_ttps": [
-            "T1053.002",
             "T1071.004",
+            "T1053.002",
             "T1589.001"
         ],
         "target_sector": "All/Unknown",
@@ -4917,8 +4954,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Sunhillo SureLine contains an OS command injection vulnerability that allows an attacker to cause a denial-of-service or utilize the device for persistence on the network via shell metacharacters in ipAddr or dnsAddr in /cgi/networkDiag.cgi.",
         "linked_ttps": [
-            "T1053.002",
-            "T1071.004"
+            "T1071.004",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Sunhillo",
@@ -4966,9 +5003,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) contain an information disclosure vulnerability. An attacker could retrieve memory contents on an affected device, which could lead to the disclosure of confidential information due to a buffer tracking issue when the software parses invalid URLs that are requested from the web services interface. This vulnerability affects only specific AnyConnect and WebVPN configurations.",
         "linked_ttps": [
-            "T1053.002",
-            "T1584.006",
             "T1102",
+            "T1584.006",
+            "T1053.002",
             "T1592.002"
         ],
         "target_sector": "All/Unknown",
@@ -5019,8 +5056,8 @@
         "description": "Roundcube Webmail contains a persistent cross-site scripting (XSS) vulnerability that can lead to information disclosure via malicious link references in plain/text messages.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1204.001"
+            "T1204.001",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Roundcube",
@@ -5082,10 +5119,10 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Atlassian Confluence Data Center and Server contain an unauthenticated OGNL template injection vulnerability that can lead to remote code execution.",
         "linked_ttps": [
+            "T1221",
             "T1053.002",
             "T1213.001",
-            "T1584.004",
-            "T1221"
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Atlassian",
@@ -5297,8 +5334,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Spreadsheet::ParseExcel contains a remote code execution vulnerability due to passing unvalidated input from a file into a string-type \u201ceval\u201d. Specifically, the issue stems from the evaluation of Number format strings within the Excel parsing logic.",
         "linked_ttps": [
-            "T1053.002",
-            "T1059.011"
+            "T1059.011",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Spreadsheet::ParseExcel",
@@ -5372,8 +5409,8 @@
         "description": "Qlik Sense contains an HTTP tunneling vulnerability that allows an attacker to escalate privileges and execute HTTP requests on the backend server hosting the software.",
         "linked_ttps": [
             "T1053.002",
-            "T1584.004",
-            "T1592.002"
+            "T1592.002",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Qlik",
@@ -5704,8 +5741,8 @@
         "description": "Roundcube Webmail contains a persistent cross-site scripting (XSS) vulnerability that allows a remote attacker to run malicious JavaScript code.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1059.007"
+            "T1059.007",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Roundcube",
@@ -6002,8 +6039,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Zyxel EMG2926 routers contain a command injection vulnerability located in the diagnostic tools, specifically the nslookup function. A malicious user may exploit numerous vectors to execute malicious commands on the router, such as the ping_ip parameter to the expert/maintenance/diagnostic/nslookup URI.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.002"
+            "T1588.002",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Zyxel",
@@ -6566,8 +6603,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "VMware Tools contains an authentication bypass vulnerability in the vgauth module. A fully compromised ESXi host can force VMware Tools to fail to authenticate host-to-guest operations, impacting the confidentiality and integrity of the guest virtual machine. An attacker must have root access over ESXi to exploit this vulnerability.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.002"
+            "T1588.002",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "VMware",
@@ -6604,8 +6641,8 @@
         "description": "Roundcube Webmail contains a cross-site scripting (XSS) vulnerability that allows an attacker to send a plain text e-mail message with Javascript in a link reference element that is mishandled by linkref_addinindex in rcube_string_replacer.php.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1059.007"
+            "T1059.007",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Roundcube",
@@ -6785,8 +6822,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Cisco IOS contains an unspecified vulnerability that may block further telnet, reverse telnet, Remote Shell (RSH), Secure Shell (SSH), and in some cases, Hypertext Transport Protocol (HTTP) access to the Cisco device.",
         "linked_ttps": [
-            "T1053.002",
-            "T1021.004"
+            "T1021.004",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Cisco",
@@ -6822,9 +6859,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Ruckus Wireless Access Point (AP) software contains an unspecified vulnerability in the web services component. If the web services component is enabled on the AP, an attacker can perform cross-site request forgery (CSRF) or remote code execution (RCE). This vulnerability impacts Ruckus ZoneDirector, SmartZone, and Solo APs.",
         "linked_ttps": [
-            "T1053.002",
-            "T1584.006",
             "T1102",
+            "T1584.006",
+            "T1053.002",
             "T1592.002"
         ],
         "target_sector": "All/Unknown",
@@ -6885,8 +6922,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Oracle Java SE and JRockit contains an unspecified vulnerability that allows remote attackers to affect confidentiality, integrity, and availability via vectors related to Java Management Extensions (JMX). This vulnerability can be exploited through sandboxed Java Web Start applications and sandboxed Java applets. It can also be exploited by supplying data to APIs in the specified component without using sandboxed Java Web Start applications or sandboxed Java applets, such as through a web service.",
         "linked_ttps": [
-            "T1053.002",
-            "T1102"
+            "T1102",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Oracle",
@@ -7203,8 +7240,8 @@
         "description": "Fortra Cobalt Strike contains a cross-site scripting (XSS) vulnerability in Teamserver that would allow an attacker to set a malformed username in the Beacon configuration, allowing them to execute code remotely.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1584.004"
+            "T1584.004",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Fortra",
@@ -7873,8 +7910,8 @@
         "description": "Cisco AnyConnect Secure Mobility Client for Windows interprocess communication (IPC) channel allows for insufficient validation of resources that are loaded by the application at run time. An attacker with valid credentials on Windows could execute code on the affected machine with SYSTEM privileges.",
         "linked_ttps": [
             "T1153",
-            "T1053.002",
             "T1589.001",
+            "T1053.002",
             "T1574.001"
         ],
         "target_sector": "All/Unknown",
@@ -7887,9 +7924,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Cisco AnyConnect Secure Mobility Client for Windows allows for incorrect handling of directory paths. An attacker with valid credentials on Windows would be able to copy malicious files to arbitrary locations with system level privileges. This could include DLL pre-loading, DLL hijacking, and other related attacks.",
         "linked_ttps": [
+            "T1589.001",
             "T1204.002",
             "T1053.002",
-            "T1589.001",
             "T1574.001"
         ],
         "target_sector": "All/Unknown",
@@ -8245,9 +8282,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Fortinet FortiOS and FortiADC contain an improper access control vulnerability that allows attackers to obtain the LDAP server login credentials configured in FortiGate by pointing a LDAP server connectivity test request to a rogue LDAP server.",
         "linked_ttps": [
+            "T1589.001",
             "T1053.002",
-            "T1584.004",
-            "T1589.001"
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Fortinet",
@@ -8543,8 +8580,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "A remote code execution vulnerability exists when Microsoft Windows MSDT is called using the URL protocol from a calling application.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.002"
+            "T1588.002",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -8580,9 +8617,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Atlassian Questions For Confluence App has hard-coded credentials, exposing the username and password in plaintext. A remote unauthenticated attacker can use these credentials to log into Confluence and access all content accessible to users in the confluence-users group.",
         "linked_ttps": [
+            "T1589.001",
             "T1053.002",
-            "T1213.001",
-            "T1589.001"
+            "T1213.001"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Atlassian",
@@ -8715,9 +8752,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "A remote code execution vulnerability exists when MSDT is called using the URL protocol from a calling application such as Word. An attacker who successfully exploits this vulnerability can run code with the privileges of the calling application.",
         "linked_ttps": [
-            "T1053.002",
             "T1588.005",
-            "T1588.002"
+            "T1588.002",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -9216,8 +9253,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "A remote code execution vulnerability exists due to the way the Windows GDI component handles objects in the memory. An attacker who successfully exploits this vulnerability could take control of the affected system.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.005"
+            "T1588.005",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -9229,8 +9266,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "A remote code execution vulnerability exists when the Windows font library improperly handles specially crafted embedded fonts. An attacker who successfully exploits this vulnerability could take control of the affected system.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.005"
+            "T1588.005",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -10432,9 +10469,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "masterCGI in the Unified Maintenance Tool in Alcatel OmniPCX Enterprise Communication Server allows remote attackers to execute arbitrary commands.",
         "linked_ttps": [
+            "T1588.002",
             "T1053.002",
-            "T1584.004",
-            "T1588.002"
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Alcatel",
@@ -10446,9 +10483,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "VMware Workspace ONE Access and Identity Manager allow for remote code execution due to server-side template injection.",
         "linked_ttps": [
+            "T1221",
             "T1053.002",
-            "T1584.004",
-            "T1221"
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "VMware",
@@ -10484,8 +10521,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Kaseya VSA RMM allows unprivileged remote attackers to execute PowerShell payloads on all managed devices.",
         "linked_ttps": [
-            "T1053.002",
-            "T1086"
+            "T1086",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Kaseya",
@@ -10861,8 +10898,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Redis is prone to a (Debian-specific) Lua sandbox escape, which could result in remote code execution.",
         "linked_ttps": [
-            "T1584.004",
-            "T1059.011"
+            "T1059.011",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Redis",
@@ -11011,8 +11048,8 @@
         "description": "The Chakra JavaScript scripting engine in Microsoft Edge allows remote attackers to execute remote code or cause a denial of service (memory corruption) via a crafted web site.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1059.007"
+            "T1059.007",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -11025,8 +11062,8 @@
         "description": "The Chakra JavaScript scripting engine in Microsoft Edge allows remote attackers to execute remote code or cause a denial of service (memory corruption) via a crafted web site.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1059.007"
+            "T1059.007",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -11628,8 +11665,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "dnslookup.cgi on NETGEAR DGN2200 devices with firmware through 10.0.0.50 allows remote authenticated users to execute arbitrary OS commands",
         "linked_ttps": [
-            "T1053.002",
             "T1071.004",
+            "T1053.002",
             "T1592.003"
         ],
         "target_sector": "All/Unknown",
@@ -11814,8 +11851,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "The ping tool in multiple D-Link and TRENDnet devices allow remote attackers to perform remote code execution.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.002"
+            "T1588.002",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "D-Link and TRENDnet",
@@ -12279,9 +12316,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Atlassian Jira Server and Data Center contain a server-side template injection vulnerability which can allow for remote code execution.",
         "linked_ttps": [
+            "T1221",
             "T1053.002",
-            "T1584.004",
-            "T1221"
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Atlassian",
@@ -12707,8 +12744,8 @@
         "description": "The Microsoft Malware Protection Engine running on Microsoft Forefront and Microsoft Defender on Microsoft Windows Server 2008 SP2 and R2 SP1, Windows 7 SP1, Windows 8.1, Windows Server 2012 Gold and R2, Windows RT 8.1, Windows 10 Gold, 1511, 1607, and 1703, and Windows Server 2016, Microsoft Exchange Server 2013 and 2016, does not properly scan a specially crafted file leading to memory corruption. aka \"Microsoft Malware Protection Engine Remote Code Execution Vulnerability\".",
         "linked_ttps": [
             "T1053.002",
-            "T1584.004",
-            "T1588.001"
+            "T1588.001",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -12721,8 +12758,8 @@
         "description": "The Simple Network Management Protocol (SNMP) subsystem of Cisco IOS 1 contains a vulnerability that could allow an authenticated, remote attacker to remotely execute code on an affected system or cause an affected system to reload. An attacker could exploit these vulnerabilities by sending a crafted SNMP packet to an affected system via IPv4 or IPv6.",
         "linked_ttps": [
             "T1053.002",
-            "T1588.006",
-            "T1592.002"
+            "T1592.002",
+            "T1588.006"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Cisco",
@@ -13186,8 +13223,8 @@
         "description": "ATMFD.DLL in the Adobe Type Manager Font Driver in Microsoft Windows Server allows local users to gain privileges via a crafted application.",
         "linked_ttps": [
             "T1053.002",
-            "T1584.004",
-            "T1574.001"
+            "T1574.001",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -14160,9 +14197,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Server Side Request Forgery (SSRF) in vRealize Operations Manager API prior to 8.4 may allow a malicious actor with network access to the vRealize Operations Manager API to perform a SSRF attack to steal administrative credentials.",
         "linked_ttps": [
+            "T1589.001",
             "T1053.002",
-            "T1584.004",
-            "T1589.001"
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "VMware",
@@ -14344,9 +14381,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "A heap buffer overflow in Fortinet FortiOS and FortiProxy may cause the SSL VPN web service termination for logged in users.",
         "linked_ttps": [
+            "T1102",
             "T1053.002",
-            "T1090",
-            "T1102"
+            "T1090"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Fortinet",
@@ -14382,9 +14419,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Serialized-object interfaces in certain IBM analytics, business solutions, cognitive, IT infrastructure, and mobile and social products allow remote attackers to execute arbitrary commands",
         "linked_ttps": [
+            "T1062",
             "T1053.002",
-            "T1584.004",
-            "T1062"
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "IBM",
@@ -14676,9 +14713,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Improper neutralization of user data in the DjVu file format in Exiftool versions 7.44 and up allows arbitrary code execution when parsing the malicious image",
         "linked_ttps": [
+            "T1588.002",
             "T1053.002",
-            "T1204.003",
-            "T1588.002"
+            "T1204.003"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Perl",
@@ -14919,8 +14956,8 @@
         "description": "Apache HTTP Server, with MPM event, worker or prefork, code executing in less-privileged child processes or threads (including scripts executed by an in-process scripting interpreter) could execute code with the privileges of the parent process (usually root) by manipulating the scoreboard.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1584.004"
+            "T1584.004",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Apache",
@@ -14956,8 +14993,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Forced Object-Graph Navigation Language (OGNL) evaluation in Apache Struts, when evaluated on raw user input in tag attributes, can lead to remote code execution.",
         "linked_ttps": [
-            "T1053.002",
-            "T1059.011"
+            "T1059.011",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Apache",
@@ -15284,8 +15321,8 @@
         "description": "Arm Trusted Firmware contains an out-of-bounds write vulnerability allowing the non-secure (NS) world to trigger a system halt, overwrite secure data, or print out secure data when calling secure functions under the non-secure processing environment (NSPE) handler mode. This vulnerability affects Yealink Device Management servers.",
         "linked_ttps": [
             "T1053.002",
-            "T1584.004",
-            "T1592.003"
+            "T1592.003",
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Arm",
@@ -15362,10 +15399,10 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Atlassian Confluence Server and Data Center contain a server-side template injection vulnerability that may allow an attacker to achieve path traversal and remote code execution.",
         "linked_ttps": [
+            "T1221",
             "T1053.002",
             "T1213.001",
-            "T1584.004",
-            "T1221"
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Atlassian",
@@ -15389,9 +15426,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) contain an improper input validation vulnerability when HTTP requests process URLs.  An attacker could exploit this vulnerability by sending a crafted HTTP request containing directory traversal character sequences to an affected device. A successful exploit could allow the attacker to view arbitrary files within the web services file system on the targeted device.",
         "linked_ttps": [
-            "T1053.002",
+            "T1102",
             "T1584.006",
-            "T1102"
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Cisco",
@@ -15403,10 +15440,10 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) contain an insufficient input validation vulnerability for user-supplied input by the web services interface.  Successful exploitation could allow an attacker to perform cross-site scripting (XSS) in the context of the interface or access sensitive browser-based information.",
         "linked_ttps": [
-            "T1053.002",
-            "T1064",
+            "T1102",
             "T1584.006",
-            "T1102"
+            "T1053.002",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Cisco",
@@ -15455,9 +15492,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Cisco IOS XR improperly validates string input from certain fields in Cisco Discovery Protocol messages. Exploitation could allow an unauthenticated, adjacent attacker to execute code with administrative privileges or cause a reload on an affected device.",
         "linked_ttps": [
+            "T1518",
             "T1053.002",
-            "T1592.002",
-            "T1518"
+            "T1592.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Cisco",
@@ -15617,8 +15654,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "D-Link DNS-320 device contains a command injection vulnerability in the sytem_mgr.cgi component that may allow for remote code execution.",
         "linked_ttps": [
-            "T1053.002",
-            "T1071.004"
+            "T1071.004",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "D-Link",
@@ -15702,8 +15739,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "GitHub Community and Enterprise Editions that utilize the ability to upload images through GitLab Workhorse are vulnerable to remote code execution. Workhorse passes image file extensions through ExifTool, which improperly validates the image files.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.002"
+            "T1588.002",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "GitLab",
@@ -16142,8 +16179,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "ImageMagick contains an unspecified vulnerability that could allow users to delete files by using ImageMagick's 'ephemeral' pseudo protocol, which deletes files after reading.",
         "linked_ttps": [
-            "T1053.002",
-            "T1070.004"
+            "T1070.004",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "ImageMagick",
@@ -16193,9 +16230,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Liferay Portal contains a deserialization of untrusted data vulnerability that allows remote attackers to execute code via JSON web services.",
         "linked_ttps": [
-            "T1053.002",
+            "T1102",
             "T1584.006",
-            "T1102"
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Liferay",
@@ -16243,8 +16280,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Microsoft Windows Active Directory contains a privilege escalation vulnerability due to the way it distributes passwords that are configured using Group Policy preferences. An authenticated attacker who successfully exploits the vulnerability could decrypt the passwords and use them to elevate privileges on the domain.",
         "linked_ttps": [
-            "T1053.002",
             "T1588.005",
+            "T1053.002",
             "T1552.006"
         ],
         "target_sector": "All/Unknown",
@@ -16697,8 +16734,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Microsoft Windows DNS Servers fail to properly handle requests, allowing an attacker to perform remote code execution in the context of the Local System Account. The vulnerability is also known under the moniker of SIGRed.",
         "linked_ttps": [
-            "T1053.002",
             "T1071.004",
+            "T1053.002",
             "T1584.004",
             "T1584.002"
         ],
@@ -16991,8 +17028,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Microsoft's Netlogon Remote Protocol (MS-NRPC) contains a privilege escalation vulnerability when an attacker establishes a vulnerable Netlogon secure channel connection to a domain controller. An attacker who successfully exploits the vulnerability could run a specially crafted application on a device on the network. The vulnerability is also known under the moniker of Zerologon.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.005"
+            "T1588.005",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -17098,11 +17135,11 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Microsoft SharePoint fails to check the source markup of an application package. An attacker who successfully exploits the vulnerability could run remote code in the context of the SharePoint application pool and the SharePoint server farm account.",
         "linked_ttps": [
-            "T1213.002",
             "T1153",
+            "T1213.002",
+            "T1584.004",
             "T1053.002",
-            "T1588.005",
-            "T1584.004"
+            "T1588.005"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -17154,8 +17191,8 @@
         "linked_ttps": [
             "T1153",
             "T1053.002",
-            "T1213.002",
-            "T1592.002"
+            "T1592.002",
+            "T1213.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Microsoft",
@@ -17383,9 +17420,9 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "PlaySMS contains a server-side template injection vulnerability that allows for remote code execution.",
         "linked_ttps": [
+            "T1221",
             "T1053.002",
-            "T1584.004",
-            "T1221"
+            "T1584.004"
         ],
         "target_sector": "All/Unknown",
         "vendor": "PlaySMS",
@@ -17591,8 +17628,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "SaltStack Salt allows an unauthenticated user with network access to the Salt API to use shell injections to run code on the Salt API using the SSH client. This vulnerability affects any users running the Salt API.",
         "linked_ttps": [
-            "T1053.002",
-            "T1021.004"
+            "T1021.004",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "SaltStack",
@@ -17680,8 +17717,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "SIMalliance Toolbox Browser contains an command injection vulnerability that could allow remote attackers to retrieve location and IMEI information or execute a range of other attacks by modifying the attack message.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.002"
+            "T1588.002",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "SIMalliance",
@@ -17854,8 +17891,8 @@
         "description": "Progress Telerik UI for ASP.NET AJAX and Sitefinity have a cryptographic weakness in Telerik.Web.UI.dll that can be exploited to disclose encryption keys (Telerik.Web.UI.DialogParametersEncryptionKey and/or the MachineKey), perform cross-site-scripting (XSS) attacks, compromise the ASP.NET ViewState, and/or upload and download files.",
         "linked_ttps": [
             "T1053.002",
-            "T1064",
-            "T1574.001"
+            "T1574.001",
+            "T1064"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Progress",
@@ -17939,8 +17976,8 @@
         "severity": "Active Exploitation (CISA KEV)",
         "description": "Trend Micro Apex One and OfficeScan contain an unspecified vulnerability within a migration tool component that allows for remote code execution.",
         "linked_ttps": [
-            "T1053.002",
-            "T1588.002"
+            "T1588.002",
+            "T1053.002"
         ],
         "target_sector": "All/Unknown",
         "vendor": "Trend Micro",
