@@ -46,3 +46,5 @@ The framework has been tested on a proprietary dataset exhibiting high class imb
 ```bash
 git clone [https://github.com/your-repo/mlem-framework.git](https://github.com/your-repo/mlem-framework.git)
 cd mlem-framework
+
+ python -m streamlit run dashboard.py  
