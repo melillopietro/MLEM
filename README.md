@@ -109,3 +109,16 @@ streamlit run dashboard/app.py
 ```
 ## 📜 License
 This project is licensed under the MIT License.
+
+## RQ3 reproducibility experiments
+
+The `rq3_validated_v2` directory contains the validation workflow used for the RQ3 experiments. It separates actor-level ATT&CK-profile similarity from chronological disclosure-level classification. The temporal experiment uses victim sector and country, reports labels that were not observed during training, and includes rolling-origin, frozen-versus-updated and contextual-drift analyses.
+
+Run the complete workflow from the repository root:
+
+```bash
+python -m pip install -r rq3_validated_v2/requirements-rq3.txt
+python rq3_validated_v2/run_all.py
+```
+
+The experimental design, output files and interpretation limits are documented in [`rq3_validated_v2/README.md`](rq3_validated_v2/README.md).

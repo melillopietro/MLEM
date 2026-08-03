@@ -57,3 +57,24 @@ models/
 # ML serialized models
 *.pkl
 
+
+# RQ3 reproducibility outputs retained for paper verification
+!rq3_validated_v2/outputs/*.csv
+!rq3_validated_v2/outputs/*.json
+!rq3_validated_v2/outputs/*.md
+!rq3_validated_v2/outputs/*.png
+
+# Local execution artifacts
+rq3_validated_v2/outputs/run_all.log
+
+rq3_validated_v2/outputs/actor_pairwise_similarity.csv
+
+rq3_validated_v2/outputs/actor_profile_matrix.csv
+
+rq3_validated_v2/outputs/actor_profiles_long.csv
+
+rq3_validated_v2/outputs/contextual_annual_composition.csv
+
+rq3_validated_v2/outputs/contextual_distribution_by_gang_year.csv
+
+rq3_validated_v2/outputs/temporal_test_predictions.csv

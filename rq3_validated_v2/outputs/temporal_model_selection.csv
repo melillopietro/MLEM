@@ -1,0 +1,2 @@
+selection_metric,selected_model
+closed_macro_f1,LogisticRegression

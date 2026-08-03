@@ -1,0 +1,33 @@
+source,target,weight
+Ako,Helldown,0.6666666666666666
+Ako,incransom,0.47058823529411764
+Helldown,incransom,0.4
+Lynx,apt73,0.4
+Lynx,malas,0.4
+Safepay,cicada3301,0.42857142857142855
+abyss,mallox,0.5517241379310345
+abyss,ragroup,1.0
+akira,play,0.3541666666666667
+apt73,ciphbit,0.5
+apt73,ransomexx,0.6666666666666666
+arvin club,metaencryptor,0.4
+arvin club,payloadbin,0.4
+babuk,hunters,0.38095238095238093
+babuk,midas,0.35
+blackbasta,medusa,0.36363636363636365
+blacksuit,royal,0.40625
+ciphbit,lorenz,0.5
+ciphbit,losttrust,0.5
+ciphbit,malas,0.5
+ciphbit,metaencryptor,0.5
+ciphbit,payloadbin,0.5
+conti,monti,1.0
+dAn0n,darkrace,1.0
+daixin,snatch,0.35714285714285715
+darkleakmarket,darkvault,0.6
+darkleakmarket,dragonforce,0.6
+darkvault,dragonforce,1.0
+donutleaks,dunghill_leak,1.0
+hunters,onyx,0.4
+mallox,ragroup,0.5517241379310345
+metaencryptor,payloadbin,1.0
