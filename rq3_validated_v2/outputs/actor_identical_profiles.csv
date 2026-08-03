@@ -1,0 +1,7 @@
+actor_a,actor_b,shared_techniques,union_techniques,jaccard_similarity,cosine_similarity,identical_profile
+abyss,ragroup,20,20,1.0,0.9999999999999998,True
+conti,monti,20,20,1.0,0.9999999999999998,True
+dAn0n,darkrace,4,4,1.0,1.0,True
+darkvault,dragonforce,4,4,1.0,1.0,True
+donutleaks,dunghill_leak,4,4,1.0,1.0,True
+metaencryptor,payloadbin,2,2,1.0,0.9999999999999998,True
