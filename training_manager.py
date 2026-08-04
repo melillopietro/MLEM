@@ -54,7 +54,7 @@ def run_training(n_estimators=150, max_depth=15):
         # === DEFINIZIONE MODELLI ===
         models_to_train = []
 
-        # 1. XGBoost (Il Campione)
+        # 1. XGBoost
         if xgb:
             models_to_train.append({
                 "name": "XGBoost",

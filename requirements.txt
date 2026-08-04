@@ -7,9 +7,8 @@ requests>=2.31.0           # Download feed CISA/CVE dal governo
 
 # === Machine Learning & AI ===
 scikit-learn>=1.3.0        # SVM, Random Forest, Preprocessing, Metrics
-xgboost>=2.0.0             # Champion Model (Gradient Boosting)
+xgboost>=2.0.0             # Gradient-boosted tree benchmark
 lightgbm>=4.0.0            # Modello alternativo (Gradient Boosting)
-tensorflow>=2.15.0         # Reti Neurali (MLP)
 shap>=0.44.0               # Explainable AI (XAI)
 
 # === Visualization & Reporting ===

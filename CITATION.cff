@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software or its experimental outputs, please cite it using this metadata."
+title: "MLEM: Ransomware Actor-Profile Analysis"
+type: software
+authors:
+  - family-names: "Melillo"
+    given-names: "Pietro"
+repository-code: "https://github.com/melillopietro/MLEM"
+license: MIT
+keywords:
+  - ransomware
+  - cyber threat intelligence
+  - MITRE ATT&CK
+  - machine learning
+  - actor profiling
+  - temporal validation

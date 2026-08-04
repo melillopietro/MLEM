@@ -1,124 +1,229 @@
-# 🛡️ MLEM: Ransomware Attribution Framework
-### Advanced Hybrid Profiling & Forensic Attribution System
+# MLEM: Ransomware Actor-Profile Analysis
 
-![Python](https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python)
-![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B?style=for-the-badge&logo=streamlit)
-![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)
+![License](https://img.shields.io/badge/License-MIT-green)
 
----
+MLEM is a research software repository for analysing ransomware actor profiles, documented MITRE ATT&CK techniques and disclosure-level contextual information.
 
-## 📖 Overview
+The repository contains two related but methodologically distinct components:
 
-**MLEM (Machine Learning for Enterprise Malware)** is an automated forensic attribution framework designed to identify ransomware threat actors based on their operational behavior.
+1. an aggregate closed-set actor-profile classification pipeline;
+2. an RQ3 reproducibility workflow separating ATT&CK-profile similarity from chronological disclosure-context experiments.
 
-Traditional detection systems rely on static signatures (hashes, IPs, domains) which are easily rotated by attackers. MLEM shifts the focus to **Behavioral Profiling** by analyzing **TTPs (Tactics, Techniques, and Procedures)** derived from the **MITRE ATT&CK Enterprise Matrix**. This allows for high-confidence attribution even when attackers modify their infrastructure, payloads, or operational artifacts.
+## Research scope
 
-The framework is built upon a massive dataset of **18,600+ real-world ransomware incidents (2020–2025)** and utilizes multiple machine learning architectures to provide both predictive power and forensic explainability.
+### Aggregate actor-profile benchmark
 
----
+The main pipeline combines:
 
-## 🎯 Key Capabilities
+- documented actor-level MITRE ATT&CK techniques;
+- victim sector;
+- victim country;
+- calendar attributes derived from disclosure dates.
 
-* **🔬 Multi-Architecture ML Benchmarking**: Automated training and comparison of five distinct architectures (XGBoost, Random Forest, SVM, KNN, MLP).
-* **📊 Forensic Intelligence Dashboard**: Interactive **Streamlit** interface featuring Sankey diagrams for attack flows, geographic victim distribution, and MITRE TTP heatmaps.
+It supports preprocessing, stratified dataset generation, multi-model comparison, model analysis and an interactive Streamlit dashboard.
 
-* **🧠 Model Explainability (SHAP)**: Integration of **SHapley Additive Explanations** to provide "Glass Box" AI, explaining exactly which TTPs influenced each attribution.
-* **🕸️ RaaS Infrastructure Detection**: Graph-based similarity analysis to detect **Ransomware-as-a-Service** patterns and link "copycat" groups to known affiliates.
-* **📑 Automated Scientific Reporting**: Generates technical reports with precision/recall metrics and confusion matrices suitable for incident response and academic use.
-* **🔌 Offline MITRE Knowledge Base**: Local database of techniques, tactics, and CVE relationships for air-gapped forensic analysis.
+The resulting scores measure closed-set recognition within the constructed actor-profile dataset. They must not be interpreted as out-of-time attribution performance on previously unseen future disclosures.
 
----
+### RQ3 reproducibility workflow
 
-## 📊 Performance Benchmarks (2025 Dataset)
+The [`rq3_validated_v2`](rq3_validated_v2/) directory contains the validation workflow used for the RQ3 experiments.
 
-The system handles the inherent class imbalance of the ransomware ecosystem by optimizing for **Macro F1-Score**.
+It separates:
 
-| Model Architecture | Accuracy | F1-Score (Macro) | Training Time | Verdict |
-| :--- | :--- | :--- | :--- | :--- |
-| **XGBoost (Champion)** | **99.56%** | **0.9882** | 78.27s | 🏆 State-of-the-Art |
-| **Random Forest** | 99.27% | 0.9706 | 2.69s | High Efficiency |
-| **SVM (RBF Kernel)** | 99.03% | 0.9700 | 19.72s | Robust |
-| **Neural Network (MLP)** | 98.73% | 0.9506 | 28.99s | Deep Learning |
-| **LightGBM** | 31.56% | 0.2214 | 10.72s | Underfitting |
+- actor-level ATT&CK profiles, used to measure documented technical overlap;
+- disclosure-level contextual observations, used for chronological classification based on victim sector and country.
 
+The workflow includes:
 
+- dataset and label auditing;
+- conservative actor-label canonicalisation;
+- ATT&CK-profile similarity analysis;
+- contextual feature ablation;
+- chronological validation and test splits;
+- unseen-label reporting;
+- rolling-origin evaluation;
+- frozen-versus-updated training comparison;
+- adjacent-year contextual drift analysis.
 
----
+The full experimental design and interpretation boundaries are documented in [`rq3_validated_v2/README.md`](rq3_validated_v2/README.md).
 
-## 🧠 Dataset & Methodology
-
-The framework leverages a structured intelligence dataset including:
-
-* **18,600+** Unique Ransomware Incidents.
-* **200+** Threat Actor Labels (e.g., LockBit, BlackBasta, Akira, CL0P).
-* **Features**: Victim sector, victim country, CVE exploitation, and 150+ MITRE ATT&CK techniques.
-
-> **Note**: Macro F1-score is prioritized over raw accuracy to ensure reliable classification of emerging or minority ransomware gangs, which are typically underrepresented in cyber threat intelligence (CTI) feeds.
-
----
-
-## 🏗 Project Structure
+## Repository structure
 
 ```text
-mlem/
-├── data/                   # Raw and processed incident datasets
-├── models/                 # Serialized model checkpoints (.pkl / .onnx)
-├── notebooks/              # Research, EDA, and feature engineering logs
-├── src/                    # Core Framework Logic
-│   ├── preprocessing/      # TTP encoding and data normalization
-│   ├── training/           # Training pipelines & hyperparameter tuning
-│   ├── attribution/        # Inference engine for live forensic cases
-│   └── explainability/     # SHAP and LIME integration modules
-├── dashboard/              # Streamlit UI source code (app.py)
-├── reports/                # Automatically generated PDF/JSON forensic reports
-├── requirements.txt        # Project dependencies
-└── main.py                 # CLI Entry point for training/inference
+MLEM/
+├── Dataset Ransomware.xlsx
+├── Dataset Normalized.csv
+├── dashboard.py
+├── normalized_dataset.py
+├── dataset_ML_Formatter.py
+├── generate_dataset.py
+├── validate_dataset.py
+├── stratification_dataset.py
+├── training_manager.py
+├── generate_model_analysis.py
+├── generate_final_graphs.py
+├── update_mitre_db.py
+├── update_cve_db.py
+├── mitre_definitions.json
+├── cve_definitions.json
+├── rq3_validated_v2/
+├── requirements.txt
+├── Dockerfile
+├── CITATION.cff
+└── LICENSE
 ```
 
-## ⚙️ Installation & Setup
-Requirements
-Python 3.12+
+Generated datasets, trained models, local reports and temporary execution artifacts are excluded from version control.
 
-16 GB RAM recommended for processing the full 2020–2025 dataset.
+## Data requirements
 
-## 1. Clone & Environment
+The workflows use the following source files in the repository root:
+
 ```text
-git clone https://github.com/your-username/mlem.git
-cd mlem
-
-# Create Virtual Environment
-python -m venv venv
-
-# Activate Environment
-# On Linux/macOS:
-source venv/bin/activate  
-# On Windows:
-.\venv\Scripts\activate
+Dataset Ransomware.xlsx
+Dataset Normalized.csv
 ```
 
-## 2. Install Dependencies
+`Dataset Normalized.csv` can be regenerated from the Excel workbook with:
+
+```bash
+python normalized_dataset.py
+```
+
+The encoded machine-learning dataset and the train, validation and test partitions are generated locally and are not versioned.
+
+## Installation
+
+From the repository root:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+On Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+## Aggregate pipeline
+
+Run preprocessing and dataset generation:
+
+```bash
+python normalized_dataset.py
+python dataset_ML_Formatter.py
+python validate_dataset.py
+python generate_dataset.py
+python stratification_dataset.py
+```
+
+Run the model comparison:
+
+```bash
+python training_manager.py
+```
+
+Generate local model-analysis outputs:
+
+```bash
+python generate_model_analysis.py
+python generate_final_graphs.py
+```
+
+The pipeline locally generates artifacts such as:
+
 ```text
-pip install -r requirements.txt
+final_ml_dataset_encoded.csv
+dataset_split/
+model_comparison_results_final.csv
+label_encoder.pkl
+XGBoost_best_model.pkl
+reports/
 ```
 
-## 3. Launch the Intelligence Dashboard
-```text
-streamlit run dashboard/app.py
+These files are excluded from version control because they can be regenerated.
+
+## Dashboard
+
+Launch the Streamlit application:
+
+```bash
+streamlit run dashboard.py
 ```
-## 📜 License
-This project is licensed under the MIT License.
 
-## RQ3 reproducibility experiments
+The dashboard supports:
 
-The `rq3_validated_v2` directory contains the validation workflow used for the RQ3 experiments. It separates actor-level ATT&CK-profile similarity from chronological disclosure-level classification. The temporal experiment uses victim sector and country, reports labels that were not observed during training, and includes rolling-origin, frozen-versus-updated and contextual-drift analyses.
+- execution of the aggregate pipeline;
+- exploratory dataset summaries;
+- model-comparison visualisations;
+- actor-profile classification;
+- MITRE ATT&CK lookup;
+- CVE and CISA KEV lookup.
 
-Run the complete workflow from the repository root:
+The classification interface is a research prototype. Its output is a model prediction and must not be considered definitive operational attribution.
+
+## RQ3 validation
+
+Install the dedicated dependencies:
 
 ```bash
 python -m pip install -r rq3_validated_v2/requirements-rq3.txt
+```
+
+Run the complete workflow:
+
+```bash
 python rq3_validated_v2/run_all.py
 ```
 
-The experimental design, output files and interpretation limits are documented in [`rq3_validated_v2/README.md`](rq3_validated_v2/README.md).
+The main report is:
+
+```text
+rq3_validated_v2/outputs/RQ3_EXPERIMENTAL_VALIDATION_REPORT.md
+```
+
+Selected compact outputs are versioned for review. Large intermediate matrices and prediction-level files are excluded because they can be regenerated.
+
+## Docker
+
+Build the container:
+
+```bash
+docker build -t mlem .
+```
+
+Run the dashboard:
+
+```bash
+docker run --rm -p 8501:8501 mlem
+```
+
+The interface will be available at:
+
+```text
+http://localhost:8501
+```
+
+## Interpretation boundaries
+
+The following limitations are important:
+
+- ATT&CK profiles are aggregate actor-level descriptions, not independently observed event-level technical features.
+- High closed-set classification scores do not demonstrate performance on future or previously unseen disclosures.
+- Context-only temporal classification based on sector and country has limited discriminatory performance.
+- Similarity between actor profiles does not prove shared ownership, affiliation, rebranding or organisational continuity.
+- The 2025 temporal evaluation is partial and includes records through 1 April 2025.
+- Results depend on the coverage, consistency and labelling quality of the underlying disclosure and actor-profile sources.
+
+## Citation
+
+Citation metadata is available in [`CITATION.cff`](CITATION.cff).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
