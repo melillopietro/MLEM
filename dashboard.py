@@ -51,9 +51,9 @@ class ForensicReport(FPDF):
     def header(self):
         if PDF_AVAILABLE: # Evita errori se FPDF non è reale
             self.set_font('Arial', 'B', 15)
-            self.cell(0, 10, 'MLEM - Automated Forensic Attribution Report', 0, 1, 'C')
+            self.cell(0, 10, 'MLEM - Actor-Profile Classification Report', 0, 1, 'C')
             self.set_font('Arial', 'I', 10)
-            self.cell(0, 10, f'Generated on: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} | Classification: CONFIDENTIAL', 0, 1, 'C')
+            self.cell(0, 10, f'Generated on: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} | Purpose: Research evaluation', 0, 1, 'C')
             self.line(10, 30, 200, 30)
             self.ln(20)
 
@@ -63,7 +63,7 @@ class ForensicReport(FPDF):
             self.set_font('Arial', 'I', 8)
             self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
 
-# === GENERATORE REPORT "MASTER CLASS" (V3 - HARDCORE TECHNICAL) ===
+# === EXPERIMENTAL REPORT GENERATOR ===
 def create_full_technical_report(df_results, meta_info):
     if not PDF_AVAILABLE:
         return b"ERROR: FPDF Library not installed."
@@ -76,9 +76,9 @@ def create_full_technical_report(df_results, meta_info):
     
     # Intestazione Istituzionale
     pdf.set_font('Arial', 'B', 18)
-    pdf.cell(0, 10, 'MLEM: Advanced Ransomware Attribution Framework', 0, 1, 'C')
+    pdf.cell(0, 10, 'MLEM: Ransomware Actor-Profile Analysis', 0, 1, 'C')
     pdf.set_font('Arial', 'I', 12)
-    pdf.cell(0, 10, 'Final Technical Validation & Forensic Benchmark Report', 0, 1, 'C')
+    pdf.cell(0, 10, 'Experimental Evaluation Report', 0, 1, 'C')
     pdf.line(10, 35, 200, 35)
     pdf.ln(15)
 
@@ -99,11 +99,11 @@ def create_full_technical_report(df_results, meta_info):
     pdf.multi_cell(0, 5, stats, border=1, fill=False)
     pdf.ln(5)
 
-    # 1.2 CHAMPION MODEL SPECS
+    # 1.2 MODEL EVALUATION SUMMARY
     best_model = df_results.loc[df_results['f1_macro'].idxmax()]
     pdf.set_font('Arial', '', 10)
     summary_text = (
-        f"The comparative benchmark identifies **{best_model['model']}** as the SOTA (State-of-the-Art) architecture for this topology. "
+        f"The comparative benchmark identifies **{best_model['model']}** as the highest-scoring model in this closed-set benchmark architecture for this topology. "
         f"Achieving a Global Accuracy of **{best_model['accuracy']:.2%}** and an **F1-Macro Score of {best_model['f1_macro']:.4f}**, "
         f"the model successfully minimizes the False Positive Rate (FPR) while maintaining high sensitivity on minority classes."
     )
@@ -116,7 +116,7 @@ def create_full_technical_report(df_results, meta_info):
     pdf.cell(0, 10, '2. Algorithmic Benchmarking (Efficiency Frontier)', 0, 1)
     
     pdf.set_font('Arial', '', 10)
-    pdf.multi_cell(0, 6, "The following table details the performance trade-offs between computational cost (Training Time) and forensic reliability (F1-Macro).")
+    pdf.multi_cell(0, 6, "The following table details the performance trade-offs between computational cost (Training Time) and classification performance (F1-Macro).")
     pdf.ln(5)
 
     # Header Tabella
@@ -132,7 +132,7 @@ def create_full_technical_report(df_results, meta_info):
     pdf.set_font('Arial', '', 9)
     for index, row in df_results.iterrows():
         is_winner = row['model'] == best_model['model']
-        if is_winner: verdict = "CHAMPION"
+        if is_winner: verdict = "Highest validation F1"
         elif row['train_time_sec'] < 2.0 and row['accuracy'] > 0.90: verdict = "Efficient"
         elif row['accuracy'] < 0.50: verdict = "Underfitting"
         else: verdict = "Standard"
@@ -224,10 +224,10 @@ def create_full_technical_report(df_results, meta_info):
     pdf.set_font('Arial', '', 10)
     net_text = (
         "Graph Theory analysis performed on the vector space identified significant sub-clusters of Threat Actors with >95% similarity. "
-        "This strongly supports the 'Affiliate Dilemma' hypothesis: different gangs sharing the same builders/source code (e.g., Conti/Babuk leaks) "
-        "or affiliates migrating between RaaS programs while retaining their TTPs.\n\n"
-        "Identified High-Similarity Clusters:\n"
-        "- Cluster Alpha: Fog, Monti, NoEscape (Likely shared builder)\n"
+        "This pattern may be consistent with several explanations, including different gangs sharing the same builders/source code (e.g., Conti/Babuk leaks) "
+        "shared tools, public code, common affiliates or incomplete profile documentation. Similarity alone does not establish organisational continuity.\n\n"
+        "Examples of high-similarity profile clusters:\n"
+        "- Cluster Alpha: Fog, Monti, NoEscape \n"
         "- Cluster Beta: LockBit3 affiliates sharing infrastructure with BlackBasta"
     )
     pdf.multi_cell(0, 6, net_text)
@@ -237,10 +237,10 @@ def create_full_technical_report(df_results, meta_info):
     pdf.cell(0, 10, '4.3 Attack Flow Vectors (Sankey Insights)', 0, 1)
     pdf.set_font('Arial', '', 10)
     sankey_text = (
-        "Macro-economic flow analysis reveals deterministic targeting patterns:\n"
+        "The descriptive distribution shows recurring sector and country patterns:\n"
         "1. Origin USA -> Target Sector: Manufacturing (Highest Volume)\n"
         "2. Origin Europe -> Target Sector: Services & Healthcare\n"
-        "This contradicts the 'opportunistic' attack theory for top-tier gangs, suggesting strategic sector-based targeting."
+        "These descriptive associations do not establish attacker intent or a causal targeting strategy."
     )
     pdf.multi_cell(0, 6, sankey_text)
 
@@ -276,7 +276,7 @@ def load_data(filepath):
     return None
 
 st.title("MLEM: Ransomware Attribution Framework")
-st.markdown("**Advanced Hybrid Profiling & Forensic Attribution System**")
+st.markdown("**Research prototype for ransomware actor-profile analysis**")
 
 # === UTILS ===
 def run_command(cmd_args, log_box):
@@ -295,7 +295,7 @@ def run_command(cmd_args, log_box):
 # === SIDEBAR ===
 with st.sidebar:
     st.header("Control Panel")
-    st.caption("🚀 Hardware Acceleration: ENABLED (Full Data Mode)")
+    st.caption("Local execution using the configured Python environment")
     
     st.markdown("### 1. Data Source")
     source = st.radio("Source:", ["Default Dataset", "Local Upload"], label_visibility="collapsed")
@@ -348,14 +348,11 @@ with tab1:
             with st.status(f"Training Models (Trees: {n_estimators}, Depth: {max_depth})...", expanded=True) as s:
                 cmd = ["training_manager.py", "--n_estimators", str(n_estimators), "--max_depth", str(max_depth)]
                 run_command(cmd, s)
-                if os.path.exists("NN_new.py"): 
-                    try: import tensorflow; run_command("NN_new.py", s)
-                    except: pass
                 s.update(label="Training Completed", state="complete")
 
         if run_anal:
             with st.status("Generating Technical Reports...", expanded=False) as s:
-                if os.path.exists("final_fixed.py"): run_command("final_fixed.py", s)
+                if os.path.exists("generate_model_analysis.py"): run_command("generate_model_analysis.py", s)
                 if os.path.exists("generate_final_graphs.py"): run_command("generate_final_graphs.py", s)
                 s.update(label="Analysis Completed", state="complete")
         
@@ -364,7 +361,7 @@ with tab1:
 
 # --- TAB 2: RESULTS ---
 with tab2:
-    st.header("Global Intelligence Dashboard")
+    st.header("Experimental Results Dashboard")
     st.markdown("### 📂 Dataset Overview & Scope")
     
     d_rows = 0; d_start = "?"; d_end = "?"; d_gangs = 0; d_ttps = 0
@@ -407,7 +404,7 @@ with tab2:
             best = df.loc[df['f1_macro'].idxmax()]
             
             c1, c2, c3 = st.columns(3)
-            c1.metric("Best F1-Score (Macro)", f"{best['f1_macro']:.4f}", delta="Champion")
+            c1.metric("Best F1-Score (Macro)", f"{best['f1_macro']:.4f}", delta="Validation-selected")
             c2.metric("Top Accuracy", f"{best['accuracy']*100:.2f}%")
             c3.metric("Best Architecture", best['model'])
             
@@ -458,7 +455,7 @@ with tab2:
 
     st.divider()
 
-    st.subheader("Global Threat Intelligence Center")
+    st.subheader("Dataset Distribution Overview")
     if PLOTLY_AVAILABLE:
         try:
             map_source_file = os.path.join(DATA_DIR, "X_train.csv")
@@ -504,7 +501,7 @@ with tab2:
 
     st.divider()
 
-    st.subheader("Threat Actor Profiling System")
+    st.subheader("Actor-Profile Summary")
     y_prof = load_data(os.path.join(DATA_DIR, "y_train.csv"))
     if y_prof is not None:
         all_gangs = sorted(y_prof['label_gang'].unique())
@@ -619,8 +616,6 @@ with tab3:
     
     with c1:
         st.subheader("📦 Raw Data Artifacts")
-        if os.path.exists("TESI_DOTTORATO_COMPLETA.docx"):
-            with open("TESI_DOTTORATO_COMPLETA.docx", "rb") as f: st.download_button("📘 Thesis (.docx)", f, "Thesis.docx")
         if os.path.exists(RESULTS_CSV):
             with open(RESULTS_CSV, "r") as f: st.download_button("📊 Results (.csv)", f.read(), "results.csv")
         if os.path.exists(MODEL_FILE):
@@ -737,7 +732,7 @@ with tab4:
 
             # 5. MOTORE DI PREDIZIONE (CORRETTO)
             st.markdown("---")
-            if st.button("🚀 IDENTIFY THREAT ACTOR", type="primary", use_container_width=True):
+            if st.button("RUN PROFILE CLASSIFICATION", type="primary", use_container_width=True):
                 
                 # A. Validazione Input (Anti-AKO)
                 input_is_empty = (len(sel_ttps) == 0) and (sel_c == "Unknown") and (sel_s == "Unknown")
@@ -783,7 +778,7 @@ with tab4:
                         # E. Visualizzazione Risultati
                         r1, r2 = st.columns([1, 2])
                         with r1:
-                            st.markdown("### 🎯 Attribution Result")
+                            st.markdown("### Classification Result")
                             
                             # Logica Semaforo
                             if confidence < 15.0:
@@ -791,8 +786,8 @@ with tab4:
                                 st.caption("Confidence is too low (<15%). This input pattern is unknown to the model.")
                             else:
                                 color = "green" if confidence > 70 else "orange"
-                                st.markdown(f"**Identified:** :{color}[{gang_name}]")
-                                st.metric("Confidence Score", f"{confidence:.2f}%")
+                                st.markdown(f"**Predicted label:** :{color}[{gang_name}]")
+                                st.metric("Model probability score", f"{confidence:.2f}%")
                             
                             with st.expander("Secondary Suspects"):
                                 top3 = np.argsort(probs)[::-1][:3]

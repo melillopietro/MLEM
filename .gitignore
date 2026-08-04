@@ -1,80 +1,50 @@
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual environment
 .venv/
-env/
 venv/
+env/
 
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints
-
-# macOS
 .DS_Store
+.idea/
+.vscode/
+.ipynb_checkpoints/
 
-# PyInstaller
-*.spec
-
-# Logs
+.pytest_cache/
+.mypy_cache/
+.pyre/
+.coverage
+htmlcov/
+build/
+dist/
 *.log
 
-# Test / coverage reports
-htmlcov/
-.tox/
-.nox/
-coverage.xml
-*.cover
-*.py,cover
-.cache
-.pytest_cache/
-
-# VSCode
-.vscode/
-
-# Dataset / artifacts (optional: keep only if generated automatically)
-*.csv
-*.xlsx
-
-# Ignore specific folders
-rationale/
-oldfile/
-models/
-
-# Environment variable files
 .env
 .env.*
 
-# MyPy / Pyright / Type checkers
-.mypy_cache/
-.dmypy.json
-.pyre/
-
-# PyCharm
-.idea/
-
-# ML serialized models
+dataset_split/
+final_ml_dataset_encoded.csv
+features_config.json
+model_comparison_results*.csv
+label_encoder.pkl
+*_best_model.pkl
 *.pkl
+*.joblib
+*.keras
 
+reports/
+rq3_evidence/
+mappa_tesi.html
+MLEM_Report_*.pdf
+*.docx
 
-# RQ3 reproducibility outputs retained for paper verification
-!rq3_validated_v2/outputs/*.csv
-!rq3_validated_v2/outputs/*.json
-!rq3_validated_v2/outputs/*.md
-!rq3_validated_v2/outputs/*.png
-
-# Local execution artifacts
 rq3_validated_v2/outputs/run_all.log
-
 rq3_validated_v2/outputs/actor_pairwise_similarity.csv
-
 rq3_validated_v2/outputs/actor_profile_matrix.csv
-
 rq3_validated_v2/outputs/actor_profiles_long.csv
-
 rq3_validated_v2/outputs/contextual_annual_composition.csv
-
 rq3_validated_v2/outputs/contextual_distribution_by_gang_year.csv
-
 rq3_validated_v2/outputs/temporal_test_predictions.csv
+
+MLEM_REFACTOR_AUDIT.txt
