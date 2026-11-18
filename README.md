@@ -63,6 +63,7 @@ MLEM/
 ├── training_manager.py
 ├── generate_model_analysis.py
 ├── generate_final_graphs.py
+├── analyze_source_workbook.py
 ├── update_mitre_db.py
 ├── update_cve_db.py
 ├── mitre_definitions.json
@@ -93,22 +94,51 @@ python normalized_dataset.py
 
 The encoded machine-learning dataset and the train, validation and test partitions are generated locally and are not versioned.
 
-## Installation
+## Installation (offline)
 
-From the repository root:
+Clone the repository and use a virtual environment at the repository root. All workflows
+run locally against the bundled `Dataset Ransomware.xlsx` and generated CSV files; no
+external dataset download is required.
 
 ```bash
+git clone https://github.com/melillopietro/MLEM.git
+cd MLEM
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
+On Debian/Ubuntu, if `python3 -m venv` fails, install the venv package first
+(for example `sudo apt install python3.12-venv`), then recreate `.venv`.
+
 On Windows PowerShell:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 ```
+
+### One-shot aggregate pipeline (offline)
+
+From the repository root, with `.venv` activated:
+
+```bash
+python normalized_dataset.py
+python dataset_ML_Formatter.py
+python validate_dataset.py
+python generate_dataset.py
+python stratification_dataset.py
+python training_manager.py
+python generate_model_analysis.py
+python generate_final_graphs.py
+python analyze_source_workbook.py
+streamlit run dashboard.py
+```
+
+`analyze_source_workbook.py` writes `SOURCE_DATASET_ANALYSIS.md`, a summary of the
+source Excel workbook (sheets, coverage, missing values, top gangs).
 
 ## Aggregate pipeline
 
@@ -142,11 +172,17 @@ final_ml_dataset_encoded.csv
 dataset_split/
 model_comparison_results_final.csv
 label_encoder.pkl
-XGBoost_best_model.pkl
+best_validation_model.pkl
+best_validation_model.json
+{Algorithm}_best_model.pkl
 reports/
+SOURCE_DATASET_ANALYSIS.md
 ```
 
-These files are excluded from version control because they can be regenerated.
+`best_validation_model.pkl` is the classifier with the highest macro-F1 on the
+validation split. The dashboard loads it before any per-algorithm pickle.
+These files are excluded from version control (except `SOURCE_DATASET_ANALYSIS.md`,
+which can be regenerated) because they can be rebuilt from the source workbook.
 
 ## Dashboard
 
@@ -169,7 +205,15 @@ The classification interface is a research prototype. Its output is a model pred
 
 ## RQ3 validation
 
-Install the dedicated dependencies:
+The RQ3 workflow is independent of aggregate model training. It reads
+`Dataset Normalized.csv` and `Dataset Ransomware.xlsx` from the repository root.
+Regenerate the normalized CSV first if you changed the workbook:
+
+```bash
+python normalized_dataset.py
+```
+
+Install the dedicated dependencies (once per environment):
 
 ```bash
 python -m pip install -r rq3_validated_v2/requirements-rq3.txt
@@ -181,13 +225,22 @@ Run the complete workflow:
 python rq3_validated_v2/run_all.py
 ```
 
+Steps execute in order: audit, actor profiles, similarity (optional if graph extras
+are missing), temporal context classification, contextual drift, report generation.
+All outputs are written under `rq3_validated_v2/outputs/`.
+
 The main report is:
 
 ```text
 rq3_validated_v2/outputs/RQ3_EXPERIMENTAL_VALIDATION_REPORT.md
 ```
 
-Selected compact outputs are versioned for review. Large intermediate matrices and prediction-level files are excluded because they can be regenerated.
+Interpretation reminder: temporal tests use victim sector and country only. Low
+macro-F1 on 2024/2025 is expected; high closed-set scores from the aggregate
+pipeline must not be read as out-of-time attribution.
+
+Selected compact outputs are versioned for review. Large intermediate matrices and
+prediction-level files are excluded because they can be regenerated.
 
 ## Docker
 
