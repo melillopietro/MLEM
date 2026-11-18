@@ -28,12 +28,15 @@ final_ml_dataset_encoded.csv
 features_config.json
 model_comparison_results*.csv
 label_encoder.pkl
+best_validation_model.json
+mlem_run_config.json
 *_best_model.pkl
 *.pkl
 *.joblib
 *.keras
 
 reports/
+experiments/comparison/**/rq3_outputs/
 rq3_evidence/
 mappa_tesi.html
 MLEM_Report_*.pdf

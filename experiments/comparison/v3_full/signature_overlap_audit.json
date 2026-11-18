@@ -1,0 +1,31 @@
+{
+  "eligible_labels": 91,
+  "eligible_rows": 16181,
+  "unique_ttp_signatures_among_labels": 86,
+  "labels_sharing_signatures": 9,
+  "signature_collisions": {
+    "T1016,T1020,T1027,T1029,T1036,T1041,T1059,T1078,T1114,T1190,T1195,T1486,T1537,T1547,T1566,T1567,T1569": [
+      "Abyss",
+      "Ragroup"
+    ],
+    "T1016,T1021,T1049,T1055,T1057,T1059,T1078,T1080,T1083,T1106,T1110,T1133,T1135,T1140,T1486,T1489,T1490,T1558,T1566": [
+      "Conti",
+      "Monti"
+    ],
+    "T1036,T1059,T1071": [
+      "Dan0N",
+      "Darkrace"
+    ],
+    "T1071,T1486": [
+      "Lorenz",
+      "Metaencryptor",
+      "Payloadbin"
+    ]
+  },
+  "random_split_test_size": 0.15,
+  "test_signatures_seen_in_train_fraction": 1.0,
+  "exact_signature_lookup_macro_f1": 0.9338775510204081,
+  "exact_signature_lookup_accuracy": 0.9855848434925865,
+  "best_classifier_validation_macro_f1_reference": 1.0,
+  "interpretation": "High lookup scores with test_signatures_seen_in_train_fraction≈1 indicate closed-set recognition of static actor profiles, not out-of-time event attribution."
+}

@@ -1,0 +1,24 @@
+{
+  "workbook": "Dataset Ransomware.xlsx",
+  "schema": "legacy",
+  "registry_sheet_rows_excel": 18602,
+  "registry_rows_with_as_of": 18589,
+  "registry_rows_unfiltered": 18602,
+  "as_of_date": "2025-04-01",
+  "distinct_gangs_raw": 231,
+  "distinct_gangs_as_of": 231,
+  "date_min": "2020-01-12",
+  "date_max_raw": "2025-04-01",
+  "date_max_as_of": "2025-03-31",
+  "disclosures_by_year_raw": {
+    "2020": 436,
+    "2021": 2616,
+    "2022": 2827,
+    "2023": 5287,
+    "2024": 5333,
+    "2025": 2103
+  },
+  "profile_rows": 174,
+  "profiles_with_techniques": 129,
+  "profiles_with_cve": 0
+}
