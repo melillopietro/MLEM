@@ -1,0 +1,4 @@
+dataset,righe_eleggibili,label_eleggibili,firme_ttp_uniche,frazione_firme_test_in_train,lookup_firma_macro_f1
+dataset_originale,15844,109,85,1.0,0.7269786093428308
+v3_finestra_paper,12908,84,79,1.0,0.9282475324347246
+v3_23807_vittime,16181,91,86,1.0,0.9338775510204081

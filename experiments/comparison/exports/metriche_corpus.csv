@@ -1,0 +1,4 @@
+dataset,workbook,as_of_date,righe_excel_registry,righe_dopo_filtro_temporale,gang_distinte,profili_gang,profili_con_tecniche,profili_con_cve,data_min,data_max_file,data_max_usato,disclosure_2025_nel_file
+dataset_originale,Dataset Ransomware.xlsx,2025-04-01,18602,18589,231,174,129,0,2020-01-12,2025-04-01,2025-03-31,2103
+v3_finestra_paper,DATASETv3.xlsx,2025-04-01,23807,18596,200,281,129,62,2020-01-12,2025-12-31,2025-03-31,7284
+v3_23807_vittime,DATASETv3.xlsx,nessuno,23807,23807,250,281,129,62,2020-01-12,2025-12-31,2025-12-31,7284
