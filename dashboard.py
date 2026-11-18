@@ -52,8 +52,16 @@ def resolve_model_path():
             return path
     return LEGACY_MODEL_FILE
 DATA_DIR = "./dataset_split"
-RAW_DATASET_XLSX = "Dataset Ransomware.xlsx"
+from mlem_workbook import resolve_workbook
+
 RAW_DATASET_CSV = "Dataset Normalized.csv"
+
+
+def active_workbook_path() -> str:
+    try:
+        return resolve_workbook().name
+    except FileNotFoundError:
+        return "Dataset Ransomware.xlsx"
 
 # === PDF CLASS ===
 class ForensicReport(FPDF):
@@ -312,7 +320,7 @@ with st.sidebar:
     if source == "Local Upload":
         up = st.file_uploader("Upload Excel/CSV", type=['xlsx', 'csv'])
         if up and st.button("Load File"):
-            dest = RAW_DATASET_XLSX if up.name.endswith('.xlsx') else RAW_DATASET_CSV
+            dest = "DATASETv3.xlsx" if up.name.endswith(".xlsx") else RAW_DATASET_CSV
             with open(dest, "wb") as f: f.write(up.getbuffer())
             st.success("File uploaded successfully.")
             

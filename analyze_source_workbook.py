@@ -1,5 +1,5 @@
 """
-Analyze Dataset Ransomware.xlsx (source workbook for MLEM).
+Analyze the active MLEM source workbook (DATASETv3.xlsx or legacy).
 Writes SOURCE_DATASET_ANALYSIS.md in the repository root.
 """
 from __future__ import annotations
@@ -9,11 +9,19 @@ from pathlib import Path
 
 import pandas as pd
 
-WORKBOOK = Path("Dataset Ransomware.xlsx")
+from mlem_workbook import (
+    detect_schema,
+    load_gang_profiles,
+    load_registry,
+    resolve_workbook,
+    workbook_summary,
+)
+
 OUTPUT = Path("SOURCE_DATASET_ANALYSIS.md")
 
 
-def sheet_overview(xl: pd.ExcelFile) -> list[dict]:
+def sheet_overview(path: Path) -> list[dict]:
+    xl = pd.ExcelFile(path)
     rows: list[dict] = []
     for name in xl.sheet_names:
         df = pd.read_excel(xl, sheet_name=name)
@@ -64,27 +72,45 @@ def analyze_dataset_sheet(df: pd.DataFrame) -> dict:
 
 
 def analyze_profile_sheet(df: pd.DataFrame) -> dict:
-    ttp_cols = [c for c in df.columns if c == "TTPS" or str(c).startswith("TTPS.")]
     out: dict = {
         "profile_rows": int(len(df)),
-        "gang_column": "Gang name" in df.columns,
-        "ttp_columns": len(ttp_cols),
+        "gangs_documented": int(df["gang"].nunique(dropna=True)),
     }
-    if "Gang name" in df.columns:
-        out["gangs_documented"] = int(df["Gang name"].nunique(dropna=True))
-        non_empty = 0
-        for _, row in df.iterrows():
-            if any(pd.notna(row.get(c)) and str(row.get(c)).strip() for c in ttp_cols):
-                non_empty += 1
-        out["profiles_with_any_ttp"] = non_empty
+    if "ttp_techniques" in df.columns:
+        has = df["ttp_techniques"].fillna("").astype(str).str.strip().ne("")
+        out["profiles_with_techniques"] = int(has.sum())
+        out["profiles_with_tactics"] = int(
+            df.get("ttp_tactics", "")
+            .fillna("")
+            .astype(str)
+            .str.strip()
+            .ne("")
+            .sum()
+        )
+    out["profile_columns"] = list(df.columns)
+    for col in [
+        "profile_origin",
+        "profile_extortion_type",
+        "profile_current_status",
+        "profile_ecosystem_phase",
+    ]:
+        if col in df.columns:
+            out[f"{col}_top"] = (
+                df[col].astype(str).value_counts().head(5).astype(int).to_dict()
+            )
     return out
 
 
-def render_markdown(overview: list[dict], dataset: dict, profile: dict) -> str:
+def render_markdown(
+    summary: dict,
+    overview: list[dict],
+    dataset: dict,
+    profile: dict,
+) -> str:
     lines = [
         "# Source workbook analysis",
         "",
-        f"File: `{WORKBOOK}`",
+        f"File: `{summary['path']}` (schema **{summary['schema']}**)",
         "",
         "## Sheets",
         "",
@@ -97,7 +123,7 @@ def render_markdown(overview: list[dict], dataset: dict, profile: dict) -> str:
     lines.extend(
         [
             "",
-            "## Dataset sheet (incidents)",
+            "## Registry / Dataset sheet",
             "",
             f"- Rows: **{dataset.get('rows', 'n/a')}**",
             f"- Distinct gangs: **{dataset.get('gang_unique', 'n/a')}**",
@@ -117,36 +143,31 @@ def render_markdown(overview: list[dict], dataset: dict, profile: dict) -> str:
             json.dumps(dataset.get("gang_top_15", {}), indent=2),
             "```",
             "",
-            "### Top victim sectors (raw labels)",
-            "",
-            "```json",
-            json.dumps(dataset.get("sector_top_10", {}), indent=2),
-            "```",
-            "",
-            "### Top victim countries",
-            "",
-            "```json",
-            json.dumps(dataset.get("country_top_10", {}), indent=2),
-            "```",
-            "",
             "### Columns with missing values",
             "",
             "```json",
             json.dumps(dataset.get("null_counts", {}), indent=2),
             "```",
             "",
-            "## Ransomware Gang Profile sheet",
+            "## Gang profile sheet",
             "",
             f"- Profile rows: **{profile.get('profile_rows', 'n/a')}**",
             f"- Documented gang names: **{profile.get('gangs_documented', 'n/a')}**",
-            f"- TTP column groups: **{profile.get('ttp_columns', 0)}**",
-            f"- Profiles with at least one TTP token: **{profile.get('profiles_with_any_ttp', 0)}**",
+            f"- Profiles with ATT&CK techniques: **{profile.get('profiles_with_techniques', 'n/a')}**",
+            f"- Profiles with ATT&CK tactics: **{profile.get('profiles_with_tactics', 'n/a')}**",
+            "",
+            "### Profile column groups",
+            "",
+            "```json",
+            json.dumps(profile.get("profile_columns", []), indent=2),
+            "```",
             "",
             "## Pipeline role",
             "",
-            "The **Dataset** sheet feeds victim-level disclosures (gang, date, sector, country). "
-            "The **Ransomware Gang Profile** sheet supplies static MITRE ATT&CK technique lists "
-            "merged onto every incident with a matching gang name during `dataset_ML_Formatter.py`.",
+            "Disclosure rows feed `Dataset Normalized.csv`. Gang profiles supply "
+            "`TTP_Techniques` / `TTP_Tactics` (v3) or legacy wide TTPS columns, plus "
+            "metadata (origin, extortion type, CVE list, lineage, status) merged in "
+            "`dataset_ML_Formatter.py` using a case-insensitive `actor_key`.",
             "",
         ]
     )
@@ -154,22 +175,13 @@ def render_markdown(overview: list[dict], dataset: dict, profile: dict) -> str:
 
 
 def main() -> None:
-    if not WORKBOOK.exists():
-        raise FileNotFoundError(WORKBOOK)
-
-    xl = pd.ExcelFile(WORKBOOK)
-    overview = sheet_overview(xl)
-
-    dataset_df = pd.read_excel(xl, sheet_name="Dataset")
-    dataset_stats = analyze_dataset_sheet(dataset_df)
-
-    profile_stats: dict = {}
-    if "Ransomware Gang Profile" in xl.sheet_names:
-        profile_df = pd.read_excel(xl, sheet_name="Ransomware Gang Profile")
-        profile_stats = analyze_profile_sheet(profile_df)
-
+    path = resolve_workbook()
+    summary = workbook_summary()
+    overview = sheet_overview(path)
+    dataset_stats = analyze_dataset_sheet(load_registry(path))
+    profile_stats = analyze_profile_sheet(load_gang_profiles(path))
     OUTPUT.write_text(
-        render_markdown(overview, dataset_stats, profile_stats),
+        render_markdown(summary, overview, dataset_stats, profile_stats),
         encoding="utf-8",
     )
     print(f"Wrote {OUTPUT}")

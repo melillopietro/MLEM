@@ -13,7 +13,7 @@ The following source files must remain in the root of the MLEM repository:
 
 ```text
 Dataset Normalized.csv
-Dataset Ransomware.xlsx
+DATASETv3.xlsx   # or legacy Dataset Ransomware.xlsx
 ```
 
 The expected repository layout is:
@@ -21,7 +21,7 @@ The expected repository layout is:
 ```text
 MLEM/
 ├── Dataset Normalized.csv
-├── Dataset Ransomware.xlsx
+├── DATASETv3.xlsx
 └── rq3_validated_v2/
     ├── README.md
     ├── requirements-rq3.txt
@@ -40,7 +40,11 @@ MLEM/
 
 ### Actor-profile analysis
 
-ATT&CK techniques are extracted from the `Ransomware Gang Profile` worksheet. Labels are canonicalised conservatively: only differences in case, whitespace and punctuation are merged. Rebrands, successors and versioned labels remain distinct.
+ATT&CK techniques are extracted from the gang profile sheet (`Gang Profile` in v3,
+`Ransomware Gang Profile` in legacy), including `TTP_Techniques` and `TTP_Tactics`
+columns when present. Labels are canonicalised conservatively: only differences in
+case, whitespace and punctuation are merged. Rebrands, successors and versioned
+labels remain distinct.
 
 The workflow produces actor-technique profiles, pairwise Jaccard and cosine similarities, agglomerative clusters and network visualisations. Similarity is evidence of overlap in the documented profiles; it is not evidence of shared ownership, affiliation or organisational continuity.
 

@@ -13,7 +13,17 @@ OUTPUT_DIR = SCRIPT_DIR / "outputs"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 DATASET_NORMALIZED = PROJECT_ROOT / "Dataset Normalized.csv"
-DATASET_XLSX = PROJECT_ROOT / "Dataset Ransomware.xlsx"
+
+import sys
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from mlem_workbook import (  # noqa: E402
+    load_gang_profiles as workbook_load_gang_profiles,
+    resolve_workbook,
+    split_attack_tokens,
+)
 RANDOM_STATE = 42
 MIN_TRAIN_SAMPLES = 10
 
@@ -24,8 +34,18 @@ COMPACT_SUBTECHNIQUE_RE = re.compile(r"^T(\d{4})(\d{3})$")
 NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 
 
+def dataset_workbook() -> Path:
+    return resolve_workbook()
+
+
 def ensure_inputs() -> None:
-    missing = [str(p) for p in (DATASET_NORMALIZED, DATASET_XLSX) if not p.exists()]
+    missing = []
+    if not DATASET_NORMALIZED.exists():
+        missing.append(str(DATASET_NORMALIZED))
+    try:
+        resolve_workbook()
+    except FileNotFoundError as exc:
+        missing.append(str(exc))
     if missing:
         raise FileNotFoundError(
             "Required project files are missing:\n- " + "\n- ".join(missing)
@@ -56,8 +76,8 @@ def build_actor_registry() -> tuple[dict[str, str], pd.DataFrame]:
     disclosure_labels = disclosure_labels[disclosure_labels != ""]
     frequencies = disclosure_labels.value_counts()
 
-    profiles = pd.read_excel(DATASET_XLSX, sheet_name="Ransomware Gang Profile", usecols=["Gang name"])
-    profile_labels = [clean_text(v, default="") for v in profiles["Gang name"].dropna()]
+    profiles = workbook_load_gang_profiles()
+    profile_labels = [clean_text(v, default="") for v in profiles["gang"].dropna()]
     profile_labels = [v for v in profile_labels if v]
     profile_by_key: dict[str, str] = {}
     ambiguous_profile_keys: set[str] = set()
@@ -166,25 +186,28 @@ def canonicalize_attack_token(raw: object) -> tuple[str | None, str]:
 
 def load_actor_profiles() -> tuple[dict[str, set[str]], pd.DataFrame, pd.DataFrame]:
     ensure_inputs()
-    profiles = pd.read_excel(DATASET_XLSX, sheet_name="Ransomware Gang Profile")
-    if "Gang name" not in profiles.columns:
-        raise ValueError("The 'Ransomware Gang Profile' sheet has no 'Gang name' column")
-
-    ttp_cols = [c for c in profiles.columns if c == "TTPS" or str(c).startswith("TTPS.")]
+    profiles = workbook_load_gang_profiles()
     actor_sets: dict[str, set[str]] = {}
     invalid_rows: list[dict[str, str]] = []
     tactic_rows: list[dict[str, str]] = []
 
     for _, row in profiles.iterrows():
-        actor = clean_text(row.get("Gang name"), default="")
+        actor = clean_text(row.get("gang"), default="")
         if not actor:
             continue
         techniques: set[str] = set()
+        token_sources = []
+        if "ttp_techniques" in row.index:
+            token_sources.append(row.get("ttp_techniques"))
+        if "ttp_tactics" in row.index:
+            token_sources.append(row.get("ttp_tactics"))
+        ttp_cols = [c for c in profiles.columns if c == "TTPS" or str(c).startswith("TTPS.")]
         for col in ttp_cols:
-            value = row.get(col)
+            token_sources.append(row.get(col))
+        for value in token_sources:
             if pd.isna(value):
                 continue
-            for raw_token in str(value).split(","):
+            for raw_token in split_attack_tokens(value):
                 canonical, status = canonicalize_attack_token(raw_token)
                 if status == "technique" and canonical:
                     techniques.add(canonical)

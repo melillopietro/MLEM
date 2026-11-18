@@ -52,7 +52,9 @@ The full experimental design and interpretation boundaries are documented in [`r
 
 ```text
 MLEM/
+├── DATASETv3.xlsx
 ├── Dataset Ransomware.xlsx
+├── mlem_workbook.py
 ├── Dataset Normalized.csv
 ├── dashboard.py
 ├── normalized_dataset.py
@@ -79,12 +81,19 @@ Generated datasets, trained models, local reports and temporary execution artifa
 
 ## Data requirements
 
-The workflows use the following source files in the repository root:
+The primary workbook is **`DATASETv3.xlsx`** (sheets `Registry` and `Gang Profile`).
+If it is absent, the code falls back to the legacy **`Dataset Ransomware.xlsx`**.
 
 ```text
-Dataset Ransomware.xlsx
-Dataset Normalized.csv
+DATASETv3.xlsx          # preferred source (v3)
+Dataset Ransomware.xlsx # legacy v2 layout
+Dataset Normalized.csv  # generated disclosure table
 ```
+
+V3 profile fields merged into the aggregate ML dataset include:
+`TTP_Techniques`, `TTP_Tactics`, origin, extortion type, programming language,
+currency, operational status, lineage, confidence, law-enforcement impact,
+ecosystem phase, registry flag, and documented CVE identifiers when present.
 
 `Dataset Normalized.csv` can be regenerated from the Excel workbook with:
 

@@ -1,37 +1,32 @@
 # Source workbook analysis
 
-File: `Dataset Ransomware.xlsx`
+File: `DATASETv3.xlsx` (schema **v3**)
 
 ## Sheets
 
 | Sheet | Rows | Columns |
 |---|---:|---:|
-| Dataset | 18602 | 10 |
-| Ransomware Gang Profile | 178 | 118 |
-| MITRE ATT&CK GROUPS  | 175 | 118 |
-| ID TTP | 423 | 5 |
-| Dashboard | 208 | 8 |
-| Note | 91 | 1 |
-| CountryGang-VictimCountry | 122 | 12 |
+| Registry | 23807 | 5 |
+| Gang Profile | 281 | 21 |
 
-## Dataset sheet (incidents)
+## Registry / Dataset sheet
 
-- Rows: **18602**
-- Distinct gangs: **231**
-- Date range: **2020-01-12** – **2025-04-01**
-- Unparseable dates: **0**
-- Exact duplicate rows: **2**
+- Rows: **23807**
+- Distinct gangs: **250**
+- Date range: **2020-01-12** – **2025-12-31**
+- Unparseable dates: **24**
+- Exact duplicate rows: **24**
 
 ### Disclosures by year
 
 ```json
 {
-  "2020": 436,
-  "2021": 2616,
-  "2022": 2827,
-  "2023": 5287,
-  "2024": 5333,
-  "2025": 2103
+  "2020.0": 436,
+  "2021.0": 2616,
+  "2022.0": 2827,
+  "2023.0": 5287,
+  "2024.0": 5333,
+  "2025.0": 7284
 }
 ```
 
@@ -39,55 +34,21 @@ File: `Dataset Ransomware.xlsx`
 
 ```json
 {
-  "lockbit3": 1974,
-  "clop": 982,
-  "alphv": 799,
-  "play": 770,
-  "ransomhub": 761,
-  "akira": 693,
-  "blackbasta": 564,
-  "lockbit2": 533,
-  "bianlian": 477,
-  "8base": 458,
-  "LockBit": 456,
-  "Conti": 384,
-  "qilin": 356,
-  "Pysa": 285,
-  "hunters": 276
-}
-```
-
-### Top victim sectors (raw labels)
-
-```json
-{
-  "Industrial": 3158,
-  "Services": 2369,
-  "Technology": 1687,
-  "Construction": 1176,
-  "Healthcare": 1116,
-  "Retail": 958,
-  "Public": 955,
-  "Financial": 940,
-  "Education": 859,
-  "Hospitality": 839
-}
-```
-
-### Top victim countries
-
-```json
-{
-  "USA": 8920,
-  "UK": 1023,
-  "Canada": 910,
-  "Germany": 749,
-  "Italy": 632,
-  "France": 590,
-  "Spain": 386,
-  "Brazil": 365,
-  "Australia": 361,
-  "India": 327
+  "Lockbit3": 1995,
+  "Qilin": 1264,
+  "Clop": 1210,
+  "Akira": 1199,
+  "Play": 1070,
+  "Alphv": 807,
+  "Ransomhub": 761,
+  "Blackbasta": 564,
+  "Medusalocker": 549,
+  "Conti": 537,
+  "Lockbit2": 533,
+  "Incransom": 488,
+  "Bianlian": 477,
+  "8Base": 458,
+  "Lockbit": 456
 }
 ```
 
@@ -95,24 +56,46 @@ File: `Dataset Ransomware.xlsx`
 
 ```json
 {
-  "ID": 3051,
-  "gang": 2,
-  "Victim Country": 186,
-  "Victim sectors": 307,
-  "NumberN/AofN/Aemployees": 11970,
-  "Sales": 12299,
-  "Ransom Currency": 18601,
-  "Ransom Paid": 18602
+  "date": 24
 }
 ```
 
-## Ransomware Gang Profile sheet
+## Gang profile sheet
 
-- Profile rows: **178**
-- Documented gang names: **174**
-- TTP column groups: **111**
-- Profiles with at least one TTP token: **129**
+- Profile rows: **281**
+- Documented gang names: **281**
+- Profiles with ATT&CK techniques: **129**
+- Profiles with ATT&CK tactics: **14**
+
+### Profile column groups
+
+```json
+[
+  "gang",
+  "profile_registry_flag",
+  "ttp_tactics",
+  "ttp_techniques",
+  "profile_primary_motivation",
+  "profile_origin",
+  "profile_extortion_type",
+  "cves_exploited",
+  "profile_programming_language",
+  "profile_currency",
+  "First_Appearance",
+  "First_Appearance_in_Dataset",
+  "Last_Appearance",
+  "profile_current_status",
+  "profile_lineage_parent",
+  "profile_lineage_type",
+  "profile_confidence_level",
+  "profile_law_enforcement_impact",
+  "profile_ecosystem_phase",
+  "profile_dataset_event_correlation",
+  "profile_aliases",
+  "actor_key"
+]
+```
 
 ## Pipeline role
 
-The **Dataset** sheet feeds victim-level disclosures (gang, date, sector, country). The **Ransomware Gang Profile** sheet supplies static MITRE ATT&CK technique lists merged onto every incident with a matching gang name during `dataset_ML_Formatter.py`.
+Disclosure rows feed `Dataset Normalized.csv`. Gang profiles supply `TTP_Techniques` / `TTP_Tactics` (v3) or legacy wide TTPS columns, plus metadata (origin, extortion type, CVE list, lineage, status) merged in `dataset_ML_Formatter.py` using a case-insensitive `actor_key`.
