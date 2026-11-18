@@ -36,6 +36,7 @@ mlem_run_config.json
 *.keras
 
 reports/
+experiments/comparison/**/rq3_outputs/
 rq3_evidence/
 mappa_tesi.html
 MLEM_Report_*.pdf

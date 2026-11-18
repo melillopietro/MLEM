@@ -3,6 +3,8 @@
 **Contesti:** replicazione finestra paper (`as-of 2025-04-01`) e confronto con estensione completa v3.  
 **Obiettivo:** risultati per il resubmit JISAS e mapping sulle critiche dei revisori.
 
+Per il confronto **a tre vie** (legacy vs v3 finestra paper vs v3 completo 23.807 righe) con metriche Tab. 5 e RQ3 cronologico, vedere [`THREE_WAY_COMPARISON_REPORT.md`](THREE_WAY_COMPARISON_REPORT.md).
+
 ---
 
 ## 1. Executive summary

@@ -143,7 +143,14 @@ python run_replication.py paper_jisas2026
 
 # Full DATASETv3 through 2025-12-31
 python run_replication.py extended_v3_full
+
+# Three-way paper comparison (legacy vs v3 paper window vs v3 full ~23.8k rows)
+python experiments/compare_three_datasets.py
+# Pin workbook explicitly when both .xlsx files are present:
+export MLEM_WORKBOOK=Dataset\ Ransomware.xlsx
 ```
+
+See [`THREE_WAY_COMPARISON_REPORT.md`](THREE_WAY_COMPARISON_REPORT.md) for the latest side-by-side metrics.
 
 Transparency artefacts (generated under `reports/`):
 

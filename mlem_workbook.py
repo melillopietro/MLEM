@@ -3,6 +3,7 @@ Load MLEM source workbooks (DATASETv3.xlsx or legacy Dataset Ransomware.xlsx).
 """
 from __future__ import annotations
 
+import os
 import re
 from enum import Enum
 from pathlib import Path
@@ -14,6 +15,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 
 WORKBOOK_V3 = PROJECT_ROOT / "DATASETv3.xlsx"
 WORKBOOK_LEGACY = PROJECT_ROOT / "Dataset Ransomware.xlsx"
+ENV_WORKBOOK = "MLEM_WORKBOOK"
 
 SHEET_REGISTRY_V3 = "Registry"
 SHEET_PROFILE_V3 = "Gang Profile"
@@ -50,6 +52,16 @@ class WorkbookSchema(str, Enum):
 
 
 def resolve_workbook() -> Path:
+    override = os.environ.get(ENV_WORKBOOK, "").strip()
+    if override:
+        path = Path(override)
+        if not path.is_absolute():
+            path = PROJECT_ROOT / path
+        if path.exists():
+            return path
+        raise FileNotFoundError(
+            f"MLEM_WORKBOOK not found: {path} (set {ENV_WORKBOOK} to a workbook under {PROJECT_ROOT})"
+        )
     if WORKBOOK_V3.exists():
         return WORKBOOK_V3
     if WORKBOOK_LEGACY.exists():

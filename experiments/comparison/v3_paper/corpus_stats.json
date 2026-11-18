@@ -1,0 +1,24 @@
+{
+  "workbook": "DATASETv3.xlsx",
+  "schema": "v3",
+  "registry_sheet_rows_excel": 23807,
+  "registry_rows_with_as_of": 18596,
+  "registry_rows_unfiltered": 23807,
+  "as_of_date": "2025-04-01",
+  "distinct_gangs_raw": 250,
+  "distinct_gangs_as_of": 200,
+  "date_min": "2020-01-12",
+  "date_max_raw": "2025-12-31",
+  "date_max_as_of": "2025-03-31",
+  "disclosures_by_year_raw": {
+    "2020.0": 436,
+    "2021.0": 2616,
+    "2022.0": 2827,
+    "2023.0": 5287,
+    "2024.0": 5333,
+    "2025.0": 7284
+  },
+  "profile_rows": 281,
+  "profiles_with_techniques": 129,
+  "profiles_with_cve": 62
+}
