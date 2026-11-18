@@ -29,6 +29,7 @@ features_config.json
 model_comparison_results*.csv
 label_encoder.pkl
 best_validation_model.json
+mlem_run_config.json
 *_best_model.pkl
 *.pkl
 *.joblib

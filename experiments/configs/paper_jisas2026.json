@@ -1,0 +1,17 @@
+{
+  "description": "JISAS 2026 paper replication window (partial 2025 through 1 April).",
+  "as_of_date": "2025-04-01",
+  "steps": [
+    "normalized_dataset.py",
+    "dataset_ML_Formatter.py",
+    "validate_dataset.py",
+    "generate_dataset.py",
+    "stratification_dataset.py",
+    "training_manager.py",
+    "dataset_descriptor.py",
+    "signature_overlap_audit.py",
+    "aggregate_ablation.py",
+    "rq3_validated_v2/run_all.py",
+    "analyze_source_workbook.py"
+  ]
+}

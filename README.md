@@ -66,6 +66,12 @@ MLEM/
 ├── generate_model_analysis.py
 ├── generate_final_graphs.py
 ├── analyze_source_workbook.py
+├── dataset_descriptor.py
+├── signature_overlap_audit.py
+├── aggregate_ablation.py
+├── run_replication.py
+├── ACTOR_LABEL_POLICY.md
+├── experiments/configs/
 ├── update_mitre_db.py
 ├── update_cve_db.py
 ├── mitre_definitions.json
@@ -127,6 +133,31 @@ On Windows PowerShell:
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
+```
+
+### Replication bundles (reviewer-oriented)
+
+```bash
+# Paper window (through 2025-04-01)
+python run_replication.py paper_jisas2026
+
+# Full DATASETv3 through 2025-12-31
+python run_replication.py extended_v3_full
+```
+
+Transparency artefacts (generated under `reports/`):
+
+- `DATASET_DESCRIPTOR.md` / `dataset_descriptor.json`
+- `signature_overlap_audit.json` / `signature_overlap_labels.csv`
+- `aggregate_ablation_results.csv`
+
+Actor-label rules: see [`ACTOR_LABEL_POLICY.md`](ACTOR_LABEL_POLICY.md).
+
+Set a cutoff manually:
+
+```bash
+python normalized_dataset.py --as-of-date 2025-04-01
+# or: export MLEM_AS_OF=2025-04-01
 ```
 
 ### One-shot aggregate pipeline (offline)

@@ -145,6 +145,10 @@ def load_disclosures(
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
     df = df[(df["gang"] != "") & df["date"].notna()].copy()
 
+    from mlem_config import apply_as_of_frame
+
+    df = apply_as_of_frame(df, date_column="date")
+
     df["year"] = df["date"].dt.year.astype(int)
     df["month"] = df["date"].dt.month.astype(int)
     df["quarter"] = df["date"].dt.quarter.astype(int)

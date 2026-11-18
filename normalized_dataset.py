@@ -1,5 +1,8 @@
+import argparse
+
 import pandas as pd
 
+from mlem_config import get_as_of_date, set_as_of_from_cli
 from mlem_workbook import load_registry, resolve_workbook, workbook_summary
 
 '''
@@ -111,19 +114,40 @@ def map_sector(value):
         return "Unknown"
     return sector_mapping.get(str(value).strip(), "Unknown")
 
-summary = workbook_summary()
-df = load_registry()
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Normalize registry disclosures to CSV.")
+    parser.add_argument(
+        "--as-of-date",
+        default=None,
+        help="Include disclosures on or before this date (YYYY-MM-DD). "
+        "Also reads MLEM_AS_OF or mlem_run_config.json.",
+    )
+    args = parser.parse_args()
+    if args.as_of_date:
+        set_as_of_from_cli(args.as_of_date)
+    elif not get_as_of_date():
+        set_as_of_from_cli(None)
 
-df['date'] = pd.to_datetime(df['date'], errors='coerce').dt.strftime('%Y-%m-%d')
-df["Victim sectors"] = df["Victim sectors"].apply(map_sector)
-df["Victim Country"] = df["Victim Country"].apply(normalize_country)
+    summary = workbook_summary()
+    df = load_registry()
 
-if "victim" not in df.columns:
-    df["victim"] = ""
+    df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    df["Victim sectors"] = df["Victim sectors"].apply(map_sector)
+    df["Victim Country"] = df["Victim Country"].apply(normalize_country)
 
-df.to_csv(output_file, index=False)
-print(f"✅ Dataset unificato salvato come: {output_file}")
-print(
-    f"   Source: {summary['path']} ({summary['schema']}) | "
-    f"{summary['registry_rows']} registry rows"
-)
+    if "victim" not in df.columns:
+        df["victim"] = ""
+
+    df.to_csv(output_file, index=False)
+    as_of = get_as_of_date()
+    print(f"✅ Dataset unificato salvato come: {output_file}")
+    print(
+        f"   Source: {summary['path']} ({summary['schema']}) | "
+        f"rows written: {len(df)}"
+    )
+    if as_of:
+        print(f"   As-of filter: {as_of}")
+
+
+if __name__ == "__main__":
+    main()

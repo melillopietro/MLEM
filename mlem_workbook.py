@@ -134,13 +134,17 @@ def _normalize_profile_columns(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def load_registry(path: Path | None = None) -> pd.DataFrame:
+def load_registry(path: Path | None = None, apply_as_of: bool = True) -> pd.DataFrame:
     path = path or resolve_workbook()
     schema = detect_schema(path)
     sheet = SHEET_REGISTRY_V3 if schema == WorkbookSchema.V3 else SHEET_DATASET_LEGACY
     df = pd.read_excel(path, sheet_name=sheet)
     if "Victim sectors" not in df.columns and "Victim Sector" in df.columns:
         df = df.rename(columns={"Victim Sector": "Victim sectors"})
+    if apply_as_of:
+        from mlem_config import apply_as_of_frame
+
+        df = apply_as_of_frame(df, date_column="date")
     return df
 
 
