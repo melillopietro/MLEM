@@ -11,22 +11,22 @@ File: `DATASETv3.xlsx` (schema **v3**)
 
 ## Registry / Dataset sheet
 
-- Rows: **23807**
-- Distinct gangs: **250**
-- Date range: **2020-01-12** – **2025-12-31**
-- Unparseable dates: **24**
+- Rows: **18596**
+- Distinct gangs: **200**
+- Date range: **2020-01-12** – **2025-03-31**
+- Unparseable dates: **0**
 - Exact duplicate rows: **24**
 
 ### Disclosures by year
 
 ```json
 {
-  "2020.0": 436,
-  "2021.0": 2616,
-  "2022.0": 2827,
-  "2023.0": 5287,
-  "2024.0": 5333,
-  "2025.0": 7284
+  "2020": 436,
+  "2021": 2616,
+  "2022": 2827,
+  "2023": 5287,
+  "2024": 5333,
+  "2025": 2097
 }
 ```
 
@@ -34,30 +34,28 @@ File: `DATASETv3.xlsx` (schema **v3**)
 
 ```json
 {
-  "Lockbit3": 1995,
-  "Qilin": 1264,
-  "Clop": 1210,
-  "Akira": 1199,
-  "Play": 1070,
+  "Lockbit3": 1974,
+  "Clop": 1088,
   "Alphv": 807,
-  "Ransomhub": 761,
+  "Play": 770,
+  "Ransomhub": 759,
+  "Akira": 693,
   "Blackbasta": 564,
-  "Medusalocker": 549,
   "Conti": 537,
   "Lockbit2": 533,
-  "Incransom": 488,
   "Bianlian": 477,
+  "Medusalocker": 467,
   "8Base": 458,
-  "Lockbit": 456
+  "Lockbit": 456,
+  "Qilin": 356,
+  "Pysa": 285
 }
 ```
 
 ### Columns with missing values
 
 ```json
-{
-  "date": 24
-}
+{}
 ```
 
 ## Gang profile sheet

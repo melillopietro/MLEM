@@ -92,6 +92,7 @@ def feature_blocks(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
             df[meta_cols].fillna("Unknown").astype(str),
             columns=meta_cols,
         )
+        # Gang-level static metadata (like TTP): useful for audit, not OOT attribution.
         blocks["ttp_plus_context_plus_cve_plus_profile"] = pd.concat(
             [blocks["ttp_plus_context_plus_cve"], meta], axis=1
         )
