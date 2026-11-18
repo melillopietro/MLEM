@@ -40,8 +40,17 @@ st.set_page_config(page_title="MLEM Framework", layout="wide", page_icon="🛡�
 
 RESULTS_CSV = "model_comparison_results_final.csv"
 FEATURES_CONFIG = "features_config.json"
-MODEL_FILE = "XGBoost_best_model.pkl"
+LEGACY_MODEL_FILE = "XGBoost_best_model.pkl"
+BEST_MODEL_FILE = "best_validation_model.pkl"
+BEST_MODEL_META = "best_validation_model.json"
 ENCODER_FILE = "label_encoder.pkl"
+
+
+def resolve_model_path():
+    for path in (BEST_MODEL_FILE, LEGACY_MODEL_FILE):
+        if os.path.exists(path):
+            return path
+    return LEGACY_MODEL_FILE
 DATA_DIR = "./dataset_split"
 RAW_DATASET_XLSX = "Dataset Ransomware.xlsx"
 RAW_DATASET_CSV = "Dataset Normalized.csv"
@@ -105,7 +114,7 @@ def create_full_technical_report(df_results, meta_info):
     summary_text = (
         f"The comparative benchmark identifies **{best_model['model']}** as the highest-scoring model in this closed-set benchmark architecture for this topology. "
         f"Achieving a Global Accuracy of **{best_model['accuracy']:.2%}** and an **F1-Macro Score of {best_model['f1_macro']:.4f}**, "
-        f"the model successfully minimizes the False Positive Rate (FPR) while maintaining high sensitivity on minority classes."
+        f"Macro-F1 was prioritized over raw accuracy to reflect performance on minority actor labels in this closed-set benchmark."
     )
     pdf.multi_cell(0, 6, summary_text)
     pdf.ln(5)
@@ -169,11 +178,12 @@ def create_full_technical_report(df_results, meta_info):
         
         pdf.set_font('Courier', '', 9)
         
-        if os.path.exists(MODEL_FILE) and os.path.exists(ENCODER_FILE):
+        model_path = resolve_model_path()
+        if os.path.exists(model_path) and os.path.exists(ENCODER_FILE):
             from sklearn.metrics import classification_report
             X_v = pd.read_csv(os.path.join(DATA_DIR, "X_val.csv"))
             y_v = pd.read_csv(os.path.join(DATA_DIR, "y_val.csv"))
-            model_v = joblib.load(MODEL_FILE)
+            model_v = joblib.load(model_path)
             le_v = joblib.load(ENCODER_FILE)
             
             y_pred = model_v.predict(X_v)
@@ -275,7 +285,7 @@ def load_data(filepath):
         return pd.read_csv(filepath)
     return None
 
-st.title("MLEM: Ransomware Attribution Framework")
+st.title("MLEM: Ransomware Actor-Profile Analysis")
 st.markdown("**Research prototype for ransomware actor-profile analysis**")
 
 # === UTILS ===
@@ -320,8 +330,21 @@ with st.sidebar:
     st.divider()
     if st.button("RESET SYSTEM CACHE"):
         st.cache_data.clear()
-        for f in [RESULTS_CSV, MODEL_FILE, ENCODER_FILE, FEATURES_CONFIG, "RandomForest_best_model.pkl"]:
-            if os.path.exists(f): os.remove(f)
+        for f in [
+            RESULTS_CSV,
+            BEST_MODEL_FILE,
+            BEST_MODEL_META,
+            LEGACY_MODEL_FILE,
+            ENCODER_FILE,
+            FEATURES_CONFIG,
+            "RandomForest_best_model.pkl",
+            "LightGBM_best_model.pkl",
+            "SVM_best_model.pkl",
+            "KNN_best_model.pkl",
+            "NeuralNet_MLP_best_model.pkl",
+        ]:
+            if os.path.exists(f):
+                os.remove(f)
         st.warning("System cache & RAM cleared. Please restart the pipeline.")
 
 # === TABS ===
@@ -618,8 +641,10 @@ with tab3:
         st.subheader("📦 Raw Data Artifacts")
         if os.path.exists(RESULTS_CSV):
             with open(RESULTS_CSV, "r") as f: st.download_button("📊 Results (.csv)", f.read(), "results.csv")
-        if os.path.exists(MODEL_FILE):
-            with open(MODEL_FILE, "rb") as f: st.download_button("🧠 Model (.pkl)", f, "model.pkl")
+        model_path = resolve_model_path()
+        if os.path.exists(model_path):
+            with open(model_path, "rb") as f:
+                st.download_button("🧠 Model (.pkl)", f, os.path.basename(model_path))
 
     with c2:
         st.subheader("📑 Automated Technical Report")
@@ -643,11 +668,12 @@ with tab4:
     st.header("Forensic Investigator & Local XAI")
     st.markdown("⚠️ **Operational Mode:** Analyze a new incident or simulate based on historical patterns.")
 
-    if os.path.exists(MODEL_FILE) and os.path.exists(FEATURES_CONFIG) and os.path.exists(ENCODER_FILE):
+    model_path = resolve_model_path()
+    if os.path.exists(model_path) and os.path.exists(FEATURES_CONFIG) and os.path.exists(ENCODER_FILE):
         try:
             # 1. Caricamento Risorse Critiche
             le = joblib.load(ENCODER_FILE)
-            model = joblib.load(MODEL_FILE)
+            model = joblib.load(model_path)
             with open(FEATURES_CONFIG, 'r') as f: feat_list = json.load(f)
             
             # 2. Creazione Mappe Pulite (Fondamentale per evitare errori di mapping)

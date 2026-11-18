@@ -40,10 +40,10 @@ print(f"Distribution:\n{df[label_col].value_counts().head(10)}")
 # === FEATURE TYPE CHECK ===
 non_numeric = df.drop(columns=[label_col]).select_dtypes(exclude=["int64", "float64", "uint8"]).columns.tolist()
 if non_numeric:
-    print("\n⚠️ Non-numeric columns among features (convert to numbers):")
+    print("\n❌ Non-numeric columns among features (convert to numbers):")
     for col in non_numeric:
         print(f" - {col}")
-else:
-    print("\n✅ All features are numeric.")
+    sys.exit(1)
 
+print("\n✅ All features are numeric.")
 print("\n✅ Validation completed.")

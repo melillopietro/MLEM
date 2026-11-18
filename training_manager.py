@@ -27,6 +27,8 @@ class Config:
     RESULTS_FILE = "model_comparison_results_final.csv"
     FEATURES_CONFIG_FILE = "features_config.json"
     ENCODER_FILE = "label_encoder.pkl"
+    BEST_MODEL_FILE = "best_validation_model.pkl"
+    BEST_MODEL_META = "best_validation_model.json"
 
 def run_training(n_estimators=150, max_depth=15):
     print("📂 Caricamento e Pulizia Dataset...")
@@ -109,7 +111,9 @@ def run_training(n_estimators=150, max_depth=15):
         # === CICLO DI TRAINING ===
         print(f"\n🚀 Avvio Training di {len(models_to_train)} modelli...")
         
-        best_f1 = 0
+        best_f1 = -1.0
+        best_model_name = None
+        best_estimator = None
 
         for m in models_to_train:
             print(f"   ⚙️  Training {m['name']}...", end=" ", flush=True)
@@ -142,16 +146,30 @@ def run_training(n_estimators=150, max_depth=15):
                     "accuracy": acc,
                     "train_time_sec": dur
                 })
-                
-                # Salviamo sempre XGBoost come default per la dashboard
-                if m["name"] == "XGBoost":
-                    joblib.dump(model, "XGBoost_best_model.pkl")
-                
+
+                artifact_path = f"{m['name']}_best_model.pkl"
+                joblib.dump(model, artifact_path)
+
                 if f1 > best_f1:
                     best_f1 = f1
-                    
+                    best_model_name = m["name"]
+                    best_estimator = model
+
             except Exception as e:
                 print(f"❌ Errore: {e}")
+
+        if best_estimator is not None:
+            joblib.dump(best_estimator, Config.BEST_MODEL_FILE)
+            with open(Config.BEST_MODEL_META, "w", encoding="utf-8") as handle:
+                json.dump(
+                    {"model": best_model_name, "f1_macro": best_f1},
+                    handle,
+                    indent=2,
+                )
+            print(
+                f"\n🏆 Best validation model: {best_model_name} "
+                f"(macro-F1={best_f1:.4f}) -> {Config.BEST_MODEL_FILE}"
+            )
 
         # Salvataggio CSV Finale
         if results:

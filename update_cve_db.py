@@ -104,7 +104,7 @@ def main():
     with open(OUTPUT_FILE, "w") as f:
         json.dump(final_db, f, indent=4)
 
-    print(f"🎉 Success! Generated production-grade DB with {len(final_db)} linked entries.")
+    print(f"🎉 Success! Generated heuristic CVE-to-TTP map with {len(final_db)} entries.")
     print(f"📂 Saved to: {OUTPUT_FILE}")
 
 
